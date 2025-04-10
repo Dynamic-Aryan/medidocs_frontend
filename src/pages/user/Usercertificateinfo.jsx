@@ -3,6 +3,7 @@ import Layout from "../../components/Layout";
 import axios from "axios";
 import { Table } from "antd";
 import API_ENDPOINTS from "../../api/endpoints";
+import { LoadingOutlined, CheckCircleOutlined } from "@ant-design/icons";
 
 const Usercertificateinfo = () => {
   const [certificates, setCertificates] = useState([]);
@@ -88,15 +89,28 @@ const Usercertificateinfo = () => {
     {
       title: "Status",
       dataIndex: "status",
-      render: (text) => (
-        <span
-          className={`px-3 py-1 rounded-full text-white ${
-            text === "Pending" ? "bg-yellow-500" : "bg-green-500"
-          }`}
-        >
-          {text}
-        </span>
-      ),
+      render: (text) => {
+        const isPending = text === "Pending";
+        const isApproved = text === "Approved";
+    
+        return (
+          <span
+            className={`px-3 py-1 rounded-full text-white inline-flex items-center gap-2 ${
+              isPending ? "bg-yellow-500" : "bg-green-500"
+            }`}
+          >
+            {isPending && <LoadingOutlined />}
+            {isApproved && <CheckCircleOutlined />}
+            {text}
+          </span>
+        );
+      },
+    },
+    {
+      title: "Approved By",
+      dataIndex: "signature",
+      className: "text-gray-600",
+      render: (text) => <span className="italic text-gray-600">Dr {text}</span>,
     },
     {
       title: "Certificate",

@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from 'react'
 import Layout from '../../components/Layout'
 import axios from 'axios';
-import { Table } from 'antd';
+import { Table, Modal, Tooltip, Button, Descriptions } from 'antd';
 import API_ENDPOINTS from '../../api/endpoints';
 
 const Medicalcertusers = () => {
   const [users, setUsers] = useState([]);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [isModalVisible, setIsModalVisible] = useState(false);
 
-   // Fetch all users
-   const getCertUsers = async () => {
+  // Fetch all users
+  const getCertUsers = async () => {
     try {
       const res = await axios.get(
         API_ENDPOINTS.getAllUsersCert,
@@ -30,7 +32,17 @@ const Medicalcertusers = () => {
     getCertUsers();
   }, []);
 
-  const columns =[
+  const showProfileModal = (user) => {
+    setSelectedUser(user);
+    setIsModalVisible(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalVisible(false);
+    setSelectedUser(null);
+  };
+
+  const columns = [
     {
       title: "Name",
       dataIndex: "name",
@@ -60,24 +72,98 @@ const Medicalcertusers = () => {
       title: "Symptoms",
       dataIndex: "symptoms",
       className: "text-gray-600",
+      render: symptoms => symptoms.join(', '),
     },
-  ]
+    {
+      title: "Status",
+      dataIndex: "status",
+      className: "text-gray-600",
+    },
+    {
+      title: "Approved By",
+      dataIndex: "signature",
+      className: "text-gray-600",
+      render: (text) => <b>By {text}</b>,
+    }
+  ];
+
+  const columns2 = [
+    ...columns,
+    {
+      title: "Action",
+      key: "action",
+      render: (_, record) => (
+        <Tooltip title="View Profile">
+      <Button
+          onClick={() => showProfileModal(record)}
+          className="border-gray-500"
+        >
+          View Profile
+        </Button>
+        </Tooltip>
+      ),
+    }
+  ];
 
   return (
     <Layout>
-       <div className="p-6 bg-white shadow-lg rounded-lg">
+      <div className="p-6 bg-white shadow-lg rounded-lg">
         <h1 className="text-2xl font-bold text-gray-800 mb-4">Users</h1>
         <div className="overflow-x-auto">
           <Table
-            columns={columns}
+            columns={columns2}
             dataSource={users}
             className="w-full border rounded-lg shadow-sm"
             pagination={{ pageSize: 5 }}
+            rowKey="_id"
           />
         </div>
       </div>
-    </Layout>
-  )
-}
 
-export default Medicalcertusers
+      {/* Profile Modal */}
+      <Modal
+        title="User Profile"
+        visible={isModalVisible}
+        onCancel={handleCloseModal}
+        footer={null}
+        width={700}
+      >
+        {selectedUser && (
+          <Descriptions
+      bordered
+      column={1}
+      size="small"
+      labelStyle={{ fontWeight: 'bold', width: '30%' }}
+    >
+      <Descriptions.Item label="Name">{selectedUser.name}</Descriptions.Item>
+      <Descriptions.Item label="Age">{selectedUser.age}</Descriptions.Item>
+      <Descriptions.Item label="Gender">{selectedUser.gender}</Descriptions.Item>
+      <Descriptions.Item label="Address">{selectedUser.address}</Descriptions.Item>
+      <Descriptions.Item label="Employer">{selectedUser.employer}</Descriptions.Item>
+      <Descriptions.Item label="Email">{selectedUser.email}</Descriptions.Item>
+      <Descriptions.Item label="Reason">{selectedUser.reason}</Descriptions.Item>
+      <Descriptions.Item label="Symptoms">{selectedUser.symptoms.join(', ')}</Descriptions.Item>
+      <Descriptions.Item label="Duration of Symptoms">{selectedUser.duration}</Descriptions.Item>
+      <Descriptions.Item label="Duration of Illness">{selectedUser.durationOfIllness}</Descriptions.Item>
+      <Descriptions.Item label="Medical History">{selectedUser.medicalHistory}</Descriptions.Item>
+      <Descriptions.Item label="Medications">{selectedUser.medications}</Descriptions.Item>
+      <Descriptions.Item label="Emergency Treatment">{selectedUser.emergencyTreatment}</Descriptions.Item>
+      <Descriptions.Item label="Previous Surgeries">{selectedUser.previousSurgeries}</Descriptions.Item>
+      <Descriptions.Item label="Family History">{selectedUser.familyHistory}</Descriptions.Item>
+      <Descriptions.Item label="Environmental Cause">{selectedUser.environmentalCause}</Descriptions.Item>
+      <Descriptions.Item label="Severity">{selectedUser.severity}</Descriptions.Item>
+      <Descriptions.Item label="Consultation Status">{selectedUser.consultationStatus}</Descriptions.Item>
+      <Descriptions.Item label="Certificate Purpose">{selectedUser.certificatePurpose}</Descriptions.Item>
+      <Descriptions.Item label="Status">{selectedUser.status}</Descriptions.Item>
+      <Descriptions.Item label="Digital Signature">{selectedUser.digitalSignature || 'N/A'}</Descriptions.Item>
+      <Descriptions.Item label="Requested At">
+        {new Date(selectedUser.requestedAt).toLocaleString()}
+      </Descriptions.Item>
+    </Descriptions>
+        )}
+      </Modal>
+    </Layout>
+  );
+};
+
+export default Medicalcertusers;

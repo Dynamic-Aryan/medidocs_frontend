@@ -23,6 +23,7 @@ import Userhub from "./pages/Userhub";
 import Usercertificate from "./pages/Usercertificate";
 import Usercertificateinfo from "./pages/user/Usercertificateinfo";
 import Fetchcertificates from "./pages/doctor/Fetchcertificates";
+import Allappointments from "./pages/admin/Allappointments";
 
 function App() {
   const { loading } = useSelector((state) => state.alerts);
@@ -92,6 +93,16 @@ function App() {
                   <Users />
                 </ProtectedRoute>
               }
+            />
+            <Route 
+             path="/admin/allappointments"
+             element={
+              <ProtectedRoute>
+                <Allappointments/>
+              </ProtectedRoute>
+             }
+
+
             />
              <Route
               path="/doctor/profile/:id"

@@ -42,6 +42,8 @@ const API_ENDPOINTS = {
   deleteDoctor: `${BASE_URL}/admin/deletedoctor`,
   adminGetAllUsers: `${BASE_URL}/admin/getallusers`,
   deleteUser: (userId) => `${BASE_URL}/admin/deleteuser/${userId}`,
+  allAppointments:`${BASE_URL}/admin/adminappointments`,
+  deleteAppointmentByAdmin:(appointmentId)=>`${BASE_URL}/admin/delete-appointment/${appointmentId}`
 };
 
 export default API_ENDPOINTS;

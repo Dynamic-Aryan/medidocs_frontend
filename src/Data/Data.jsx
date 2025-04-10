@@ -11,8 +11,8 @@ export const ADMIN_MENU = [
    
   },
   {
-    name: "Appointments",
-    path: "/appointments",
+    name: "All Appointments",
+    path: "/admin/allappointments",
     
   },
   {
@@ -36,11 +36,7 @@ export const ADMIN_MENU = [
     path: "/admin/users",
     
   },
-  {
-    name: "Certificate Status",
-    path: "/certificatestatus",
-    
-  },
+  
   {
     name: "List of Users applied for medical certificate",
     path: "/usersforcertificate",

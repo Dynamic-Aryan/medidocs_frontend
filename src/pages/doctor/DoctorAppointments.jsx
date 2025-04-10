@@ -1,24 +1,23 @@
 import React, { useEffect, useState } from "react";
 import Layout from "../../components/Layout";
-import { Button, message, Table } from "antd";
+import { Button, Descriptions, message, Modal, Table, Tooltip } from "antd";
 import moment from "moment";
 import axios from "axios";
-import { DeleteOutlined } from "@ant-design/icons";
+import { AliwangwangOutlined, CheckCircleOutlined, DeleteOutlined, LoadingOutlined } from "@ant-design/icons";
 import API_ENDPOINTS from "../../api/endpoints";
 
 const DoctorAppointments = () => {
   const [appointments, setAppointments] = useState([]);
+  const [selectedAppointment, setSelectedAppointment] = useState(null);
+  const [isModalVisible, setIsModalVisible] = useState(false);
 
   const getAppointments = async () => {
     try {
-      const res = await axios.get(
-        API_ENDPOINTS.doctorAppointments,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
+      const res = await axios.get(API_ENDPOINTS.doctorAppointments, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
       if (res.data.success) {
         setAppointments(res.data.data);
       }
@@ -77,12 +76,31 @@ const DoctorAppointments = () => {
     }
   };
 
+  const showProfileModal = (appointment) => {
+    setSelectedAppointment(appointment);
+    setIsModalVisible(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalVisible(false);
+    setSelectedAppointment(null);
+  };
+
   const columns = [
     {
       title: "ID",
       dataIndex: "_id",
     },
-
+    {
+      title: "Patient Name",
+      dataIndex: "userId",
+      render: (text, record) => <span>{record.userId.name}</span>,
+    },
+    {
+      title: "Patient Email",
+      dataIndex: "userId",
+      render: (text, record) => <span>{record.userId.email}</span>,
+    },
     {
       title: "Date & Time",
       dataIndex: "date",
@@ -93,19 +111,23 @@ const DoctorAppointments = () => {
     {
       title: "Status",
       dataIndex: "status",
-      render: (text, record) => (
-        <span
-          className={`px-3 py-1 rounded-full text-white ${
-            record.status === "pending"
-              ? "bg-yellow-500"
-              : record.status === "approved"
-              ? "bg-green-500"
-              : "bg-red-500"
-          }`}
-        >
-          {record.status}
-        </span>
-      ),
+      render: (text) => {
+        const status = text?.toLowerCase().trim();
+        const isPending = status === "pending";
+        const isApproved = status === "approve";
+    
+        return (
+          <span
+            className={`px-3 py-1 rounded-full text-white font-semibold inline-flex items-center gap-2 ${
+              isPending ? "bg-yellow-500" : "bg-green-500"
+            }`}
+          >
+            {isPending && <LoadingOutlined />}
+            {isApproved && <CheckCircleOutlined />}
+            {text}
+          </span>
+        );
+      },
     },
     {
       title: "Actions",
@@ -113,7 +135,7 @@ const DoctorAppointments = () => {
       render: (text, record) => (
         <div className="flex text-white">
           {record.status === "pending" && (
-            <>
+            <div className="flex gap-0.5">
               <button
                 className="px-4 py-2 bg-green-600 rounded-lg hover:bg-green-700 transition cursor-pointer"
                 onClick={() => handleStatus(record, "approve")}
@@ -126,16 +148,22 @@ const DoctorAppointments = () => {
               >
                 Reject
               </button>
-            </>
+            </div>
           )}
-          <Button
-            className="px-4 py-2 bg-gray-600 rounded-lg hover:bg-gray-700 transition cursor-pointer"
-            onClick={() => handleAppointments(record._id)}
-            type="dashed"
-            icon={<DeleteOutlined />}
-          >
-          
-          </Button>
+          <Tooltip title="View Profile">
+            <Button
+              type="default"
+              onClick={() => showProfileModal(record)}
+              className="border-gray-500"
+              icon={<AliwangwangOutlined />}
+            ></Button>
+          </Tooltip>
+             <Button
+                      className="px-4 py-2 bg-gray-600 rounded-lg hover:bg-gray-700 transition cursor-pointer"
+                      onClick={() => handleAppointments(record._id)}
+                      type="dashed"
+                      icon={<DeleteOutlined />}
+                    ></Button>
         </div>
       ),
     },
@@ -154,6 +182,33 @@ const DoctorAppointments = () => {
           className="shadow-lg"
         />
       </div>
+      <Modal
+        visible={isModalVisible}
+        title="Profile Details"
+        footer={null}
+        onCancel={handleCloseModal}
+      >
+        {selectedAppointment && (
+          <Descriptions bordered column={1} size="small">
+            <Descriptions.Item label="User Name">
+              {selectedAppointment.userId?.name || "N/A"}
+            </Descriptions.Item>
+            <Descriptions.Item label="User Email">
+              {selectedAppointment.userId?.email || "N/A"}
+            </Descriptions.Item>
+
+            <Descriptions.Item label="Appointment Date">
+              {moment(selectedAppointment.date).format("DD-MM-YYYY")}
+            </Descriptions.Item>
+            <Descriptions.Item label="Time">
+              {moment(selectedAppointment.date).format("HH:mm")}
+            </Descriptions.Item>
+            <Descriptions.Item label="Status">
+              {selectedAppointment.status}
+            </Descriptions.Item>
+          </Descriptions>
+        )}
+      </Modal>
     </Layout>
   );
 };

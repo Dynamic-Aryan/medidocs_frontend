@@ -4,6 +4,7 @@ import axios from "axios";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import API_ENDPOINTS from "../api/endpoints";
+import { LoadingOutlined, CheckCircleOutlined } from "@ant-design/icons";
 
 const Usercertificate = () => {
   const [certificates, setCertificates] = useState([]);
@@ -11,14 +12,11 @@ const Usercertificate = () => {
 
   const fetchCertificates = async () => {
     try {
-      const res = await axios.get(
-        API_ENDPOINTS.userMedicalCertificateStatus,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
+      const res = await axios.get(API_ENDPOINTS.userMedicalCertificateStatus, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
       if (res.data.success) {
         setCertificates(res.data.data);
       }
@@ -32,43 +30,53 @@ const Usercertificate = () => {
   useEffect(() => {
     fetchCertificates();
   }, []);
+
   const handleDownloadPDF = (certificate) => {
     const doc = new jsPDF("p", "mm", "a4");
-  
-    // Background Color
+
+    // Colors
+    const primary = [34, 58, 94]; // Navy Blue
+    const accent = [218, 165, 32]; // Golden
+    const lightGray = [240, 240, 240];
+    const textDark = [40, 40, 40];
+
+    // Full Page Background
     doc.setFillColor(255, 255, 255);
     doc.rect(0, 0, 210, 297, "F");
-  
-    // Border - Cyan & Gray Theme
-    doc.setDrawColor(60, 180, 200); // Cyan
-    doc.setLineWidth(2);
+
+    // Border
+    doc.setDrawColor(...accent);
+    doc.setLineWidth(1.5);
     doc.rect(10, 10, 190, 277);
-  
-    // Title - MEDICAL CERTIFICATE
+
+    // Header Block
+    doc.setFillColor(...primary);
+    doc.rect(10, 10, 190, 30, "F");
+
+    doc.setTextColor(255, 255, 255);
     doc.setFont("helvetica", "bold");
     doc.setFontSize(22);
-    doc.setTextColor(30, 150, 170); // Cyan
-    doc.text("MEDICAL CERTIFICATE", 105, 30, { align: "center" });
-  
-    // Subheading
-    doc.setFontSize(12);
-    doc.setFont("helvetica", "italic");
-    doc.setTextColor(100, 100, 100); // Gray
-    doc.text("Official Health Record", 105, 38, { align: "center" });
-  
-    // Divider Line
-    doc.setDrawColor(150, 150, 150); // Light Gray
-    doc.setLineWidth(0.5);
-    doc.line(40, 45, 170, 45);
-  
-    // Certificate Details Table
+    doc.text("MEDICAL CERTIFICATE", 105, 25, { align: "center" });
+
+    doc.setFontSize(10);
+    doc.text("Issued by Medidocs Health Records", 105, 33, { align: "center" });
+
+    // Divider
+    doc.setDrawColor(...accent);
+    doc.setLineWidth(0.3);
+    doc.line(30, 45, 180, 45);
+
+    // Certificate Info
     autoTable(doc, {
-      startY: 55,
+      startY: 50,
       theme: "plain",
-      styles: { fontSize: 11, textColor: 50 },
-      headStyles: { fillColor: [30, 150, 170], textColor: 255, fontStyle: "bold" }, // Cyan Header
-      alternateRowStyles: { fillColor: [230, 230, 230] }, // Light Gray Rows
       margin: { left: 20, right: 20 },
+      styles: { fontSize: 11, textColor: textDark[0], cellPadding: 2 },
+      headStyles: {
+        fontStyle: "bold",
+        textColor: primary,
+      },
+      alternateRowStyles: { fillColor: lightGray },
       head: [["Field", "Details"]],
       body: [
         ["Name", certificate.name],
@@ -80,7 +88,7 @@ const Usercertificate = () => {
         ["Duration", `${certificate.duration} days`],
         ["Reason", certificate.reason],
         ["Symptoms", certificate.symptoms?.join(", ") || "N/A"],
-        ["Duration Of Illness", certificate.durationOfIllness],
+        ["Duration of Illness", certificate.durationOfIllness],
         ["Medical History", certificate.medicalHistory],
         ["Medications", certificate.medications],
         ["Emergency Treatment", certificate.emergencyTreatment],
@@ -93,79 +101,136 @@ const Usercertificate = () => {
         ["Status", certificate.status],
       ],
     });
-  
-    // Issued Date
-    const currentDate = new Date().toLocaleDateString();
-    doc.setFontSize(11);
-    doc.setFont("helvetica", "italic");
-    doc.setTextColor(80, 80, 80);
-    doc.text(`Issued Date: ${currentDate}`, 20, doc.lastAutoTable.finalY + 15);
-  
-    // Watermark - MEDIDOCS
-    doc.setTextColor(200, 200, 200);
-    doc.setFontSize(35);
+
+    const finalY = doc.lastAutoTable.finalY;
+
+    // Signature Section
+    doc.setFontSize(13);
     doc.setFont("helvetica", "bold");
-    doc.text("MEDIDOCS", 105, 250, { align: "center", angle: 20 });
-  
-    // Save PDF
+    doc.setTextColor(...primary);
+    doc.text("Authorized Signatures", 20, finalY + 15);
+
+    // Highlight Box (optional, adds emphasis)
+    doc.setFillColor(248, 248, 248); // Light gray background
+    doc.rect(18, finalY + 18, 174, 30, "F");
+
+    // Labels + Values
+    doc.setFontSize(11.5);
+    doc.setTextColor(...textDark);
+
+    // Typed Signature
+    doc.setFont("helvetica", "bold");
+    doc.text("Typed Signature:", 20, finalY + 25);
+    doc.setFont("helvetica", "normal");
+    doc.text(`${certificate.signature || "N/A"}`, 65, finalY + 25);
+
+    // Digital Signature
+    doc.setFont("helvetica", "bold");
+    doc.text("Digital Signature:", 20, finalY + 32);
+    doc.setFont("helvetica", "normal");
+    doc.text(`${certificate.digitalSignature || "N/A"}`, 65, finalY + 32);
+
+    // Issued Date
+    doc.setFont("helvetica", "bold");
+    doc.text("Issued Date:", 20, finalY + 39);
+    doc.setFont("helvetica", "normal");
+    doc.text(`${new Date().toLocaleDateString()}`, 65, finalY + 39);
+
+    // Footer Branding
+    doc.setDrawColor(...accent);
+    doc.setLineWidth(0.2);
+    doc.line(20, 285, 190, 285);
+
+    doc.setFontSize(9);
+    doc.setTextColor(100, 100, 100);
+    doc.setFont("helvetica", "italic");
+    doc.text(
+      "This document is digitally generated by Medidocs — Your Trusted Medical Partner",
+      105,
+      290,
+      { align: "center" }
+    );
+
     doc.save(`Medical_Certificate_${certificate.name}.pdf`);
   };
-  
-  
-
 
   return (
     <Layout>
-      <div className="max-w-4xl mx-auto p-6 bg-teal-50 shadow-xl rounded-lg mt-6 border border-teal-200">
-        <h1 className="text-3xl font-bold text-teal-800 mb-6 text-center uppercase">
-          Your Medical Certificates
+      <div className="max-w-5xl mx-auto p-6 mt-10">
+        <h1 className="text-4xl font-extrabold text-center text-teal-700 mb-10 tracking-wide">
+          📄 Your Medical Certificates
         </h1>
 
         {loading ? (
-          <p className="text-center text-gray-600">Loading...</p>
+          <p className="text-center text-gray-600 text-lg animate-pulse">
+            Loading certificates...
+          </p>
         ) : certificates.length > 0 ? (
           certificates.map((certificate) => (
             <div
               key={certificate._id}
-              className="bg-white p-6 rounded-lg shadow-md border-l-8 border-teal-700 mb-6"
+              className="bg-white/70 backdrop-blur-lg border border-teal-200 shadow-xl p-6 rounded-2xl mb-8 transition-all duration-300 hover:shadow-2xl"
             >
-              <h2 className="text-xl font-bold text-teal-800 flex items-center">
-                <span className="mr-2">📜</span> {certificate.name}
-              </h2>
-              <p className="text-gray-700">
-                <strong>Email:</strong> {certificate.email}
-              </p>
-              <p className="text-gray-700">
-                <strong>Status:</strong>{" "}
+              <div className="flex items-center justify-between">
+                <h2 className="text-2xl font-bold text-teal-800">
+                  {certificate.name}
+                </h2>
                 <span
-                  className={`ml-2 px-3 py-1 text-white rounded-full ${
+                  className={`px-3 py-1 rounded-full text-sm font-semibold shadow-sm inline-flex items-center gap-2 ${
                     certificate.status === "Pending"
-                      ? "bg-yellow-500"
-                      : "bg-green-600"
+                      ? "bg-yellow-400 text-yellow-900 animate-pulse"
+                      : "bg-green-500 text-white"
                   }`}
                 >
+                  {certificate.status === "Pending" && <LoadingOutlined />}
+                  {certificate.status === "Approved" && <CheckCircleOutlined />}
                   {certificate.status}
                 </span>
+              </div>
+
+              <p className="text-gray-700 mt-2">
+                <strong>Email:</strong> {certificate.email}
               </p>
+
               {certificate.status === "Pending" ? (
-                <p className="text-amber-800 font-medium">
-                  {certificate.name}, your certificate approval is Pending!!!.
+                <p className="text-amber-700 font-medium mt-3 italic">
+                  ⏳ {certificate.name}, your certificate is still pending
+                  approval.
                 </p>
               ) : (
-                <p className="text-yellow-700">
-                  {certificate.name}, your certificate is Approved .{" "}
+                <>
+                  <p className="text-green-700 font-medium mt-3">
+                    ✅ {certificate.name}, your certificate has been approved.
+                  </p>
+                  <div className="mt-2 text-sm text-gray-700 space-y-1">
+                    <p>
+                      <strong>Typed Signature:</strong>{" "}
+                      <span className="italic">
+                        {certificate.signature || "N/A"}
+                      </span>
+                    </p>
+                    <p>
+                      <strong>Digital Signature:</strong>{" "}
+                      <span className="italic">
+                        {certificate.digitalSignature || "N/A"}
+                      </span>
+                    </p>
+                  </div>
+
                   <button
                     onClick={() => handleDownloadPDF(certificate)}
-                    className="ml-2 bg-purple-300 px-4 py-2 rounded-lg font-semibold shadow-md hover:bg-purple-200 transition-all cursor-pointer"
+                    className="mt-4 bg-gradient-to-r from-purple-400 to-purple-600 text-white px-5 py-2 rounded-lg font-semibold shadow-md hover:from-purple-500 hover:to-purple-700 transition-all"
                   >
-                    Download Here
+                    📥 Download Certificate
                   </button>
-                </p>
+                </>
               )}
             </div>
           ))
         ) : (
-          <p className="text-center text-red-500">No certificates found.</p>
+          <p className="text-center text-red-500 text-lg font-medium">
+            No certificates found.
+          </p>
         )}
       </div>
     </Layout>
