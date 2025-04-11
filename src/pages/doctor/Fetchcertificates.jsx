@@ -2,12 +2,13 @@ import React, { useEffect, useState } from "react";
 import Layout from "../../components/Layout";
 import axios from "axios";
 import { Button, Table, Modal, Input, message } from "antd";
-import { DeleteOutlined } from "@ant-design/icons";
+import { DeleteOutlined, SearchOutlined } from "@ant-design/icons";
 import API_ENDPOINTS from "../../api/endpoints";
-
 
 const Fetchcertificates = () => {
   const [certificates, setCertificates] = useState([]);
+  const [filteredCertificates, setFilteredCertificates] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
   const [signatureModalVisible, setSignatureModalVisible] = useState(false);
   const [selectedCertificateId, setSelectedCertificateId] = useState(null);
   const [signatureInput, setSignatureInput] = useState("");
@@ -18,6 +19,7 @@ const Fetchcertificates = () => {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       setCertificates(res.data.data);
+      setFilteredCertificates(res.data.data);
     } catch (error) {
       console.error("Error fetching certificates", error);
     }
@@ -26,6 +28,14 @@ const Fetchcertificates = () => {
   useEffect(() => {
     fetchCertificates();
   }, []);
+
+  const handleSearch = (value) => {
+    setSearchTerm(value);
+    const filtered = certificates.filter((cert) =>
+      cert.name.toLowerCase().includes(value.toLowerCase())
+    );
+    setFilteredCertificates(filtered);
+  };
 
   const handleApproveWithSignature = async () => {
     try {
@@ -46,11 +56,16 @@ const Fetchcertificates = () => {
         }
       );
 
-      setCertificates((prev) =>
-        prev.map((cert) =>
-          cert._id === selectedCertificateId
-            ? { ...cert, status: "Approved", signature: signatureInput }
-            : cert
+      const updated = certificates.map((cert) =>
+        cert._id === selectedCertificateId
+          ? { ...cert, status: "Approved", signature: signatureInput }
+          : cert
+      );
+
+      setCertificates(updated);
+      setFilteredCertificates(
+        updated.filter((cert) =>
+          cert.name.toLowerCase().includes(searchTerm.toLowerCase())
         )
       );
 
@@ -73,9 +88,13 @@ const Fetchcertificates = () => {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         }
       );
-      setCertificates((prev) =>
-        prev.map((cert) =>
-          cert._id === certificateId ? { ...cert, status: "Rejected" } : cert
+      const updated = certificates.map((cert) =>
+        cert._id === certificateId ? { ...cert, status: "Rejected" } : cert
+      );
+      setCertificates(updated);
+      setFilteredCertificates(
+        updated.filter((cert) =>
+          cert.name.toLowerCase().includes(searchTerm.toLowerCase())
         )
       );
     } catch (error) {
@@ -88,8 +107,12 @@ const Fetchcertificates = () => {
       await axios.delete(API_ENDPOINTS.deleteCertificate(certificateId), {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
-      setCertificates((prev) =>
-        prev.filter((cert) => cert._id !== certificateId)
+      const updated = certificates.filter((cert) => cert._id !== certificateId);
+      setCertificates(updated);
+      setFilteredCertificates(
+        updated.filter((cert) =>
+          cert.name.toLowerCase().includes(searchTerm.toLowerCase())
+        )
       );
     } catch (error) {
       console.error("Error deleting certificate", error);
@@ -162,12 +185,25 @@ const Fetchcertificates = () => {
 
   return (
     <Layout>
-      <div className="p-4">
-        <h1 className="text-2xl font-bold mb-4">Manage Certificates</h1>
+      <div className="p-6 bg-white shadow-lg rounded-lg">
+        <h1 className="text-3xl font-extrabold text-gray-800 mb-4">
+          Manage Certificates
+        </h1>
+
+        {/* 🔍 Search Input */}
+        <div className="flex justify-between items-center mb-4">
+          <input
+            placeholder="Search by name..."
+            className="border px-3 py-1 rounded-md w-1/3"
+            value={searchTerm}
+            onChange={(e) => handleSearch(e.target.value)}
+          />
+        </div>
+
         <div className="bg-white rounded shadow-md p-4">
           <Table
             columns={columns}
-            dataSource={certificates}
+            dataSource={filteredCertificates}
             rowKey="_id"
             className="overflow-x-auto"
           />
@@ -185,7 +221,9 @@ const Fetchcertificates = () => {
           okText="Approve"
           cancelText="Cancel"
         >
-          <div className="mb-2 text-sm">Please enter your digital signature:</div>
+          <div className="mb-2 text-sm">
+            Please enter your digital signature:
+          </div>
           <Input
             placeholder="Dr. John Doe"
             value={signatureInput}

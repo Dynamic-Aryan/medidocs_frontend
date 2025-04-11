@@ -24,6 +24,7 @@ import Usercertificate from "./pages/Usercertificate";
 import Usercertificateinfo from "./pages/user/Usercertificateinfo";
 import Fetchcertificates from "./pages/doctor/Fetchcertificates";
 import Allappointments from "./pages/admin/Allappointments";
+import Userstatus from "./pages/admin/Userstatus";
 
 function App() {
   const { loading } = useSelector((state) => state.alerts);
@@ -99,6 +100,16 @@ function App() {
              element={
               <ProtectedRoute>
                 <Allappointments/>
+              </ProtectedRoute>
+             }
+
+
+            />
+            <Route 
+             path="/admin/changestatus"
+             element={
+              <ProtectedRoute>
+                <Userstatus/>
               </ProtectedRoute>
              }
 

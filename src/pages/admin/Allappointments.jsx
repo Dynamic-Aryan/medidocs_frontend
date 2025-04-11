@@ -10,19 +10,17 @@ import {
   AliwangwangOutlined,
   CheckCircleOutlined,
   DeleteOutlined,
-  DownCircleTwoTone,
   DownloadOutlined,
   LoadingOutlined,
-  ProfileOutlined,
-  ProfileTwoTone,
 } from "@ant-design/icons";
 
 const Allappointments = () => {
   const [allappointments, setAllappointments] = useState([]);
   const [selectedAppointment, setSelectedAppointment] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
 
-  //getallappointments
+  // Get all appointments
   const getAllappointments = async () => {
     try {
       const res = await axios.get(API_ENDPOINTS.allAppointments, {
@@ -37,11 +35,12 @@ const Allappointments = () => {
       console.error("Error fetching appointments:", error);
     }
   };
+
   useEffect(() => {
     getAllappointments();
   }, []);
 
-  //deleteappointments
+  // Delete appointment
   const handleAppointments = async (appointmentId) => {
     try {
       const res = await axios.delete(
@@ -53,10 +52,8 @@ const Allappointments = () => {
 
       if (res.data.success) {
         message.success(res.data.message);
-        setAllappointments((prevAppointments) =>
-          prevAppointments.filter(
-            (appointment) => appointment._id !== appointmentId
-          )
+        setAllappointments((prev) =>
+          prev.filter((appointment) => appointment._id !== appointmentId)
         );
       }
     } catch (error) {
@@ -65,23 +62,21 @@ const Allappointments = () => {
     }
   };
 
+  // Generate PDF
   const generatePDF = (appointment) => {
     const doc = new jsPDF({
       orientation: "portrait",
       unit: "mm",
-      format: [105, 148], // A6 size: 105mm x 148mm
+      format: [105, 148], // A6
     });
 
-    // Custom styling
-    doc.setFillColor(41, 128, 185); // Blue header
-    doc.rect(0, 0, 105, 20, "F"); // Fill rectangle (header)
-
+    doc.setFillColor(41, 128, 185);
+    doc.rect(0, 0, 105, 20, "F");
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(14);
     doc.setFont("helvetica", "bold");
     doc.text("Appointment Confirmation", 52.5, 12, { align: "center" });
 
-    // Reset for body
     doc.setTextColor(33, 33, 33);
     doc.setFontSize(11);
     doc.setFont("helvetica", "normal");
@@ -94,7 +89,6 @@ const Allappointments = () => {
         "Doctor Name",
         `${appointment.doctorId?.firstName} ${appointment.doctorId?.lastName}`,
       ],
-
       ["Date", moment(appointment.date).format("DD-MM-YYYY")],
       ["Time", moment(appointment.date).format("HH:mm")],
       ["Status", appointment.status],
@@ -117,7 +111,6 @@ const Allappointments = () => {
       margin: { left: 10, right: 10 },
     });
 
-    // Footer note
     doc.setFontSize(9);
     doc.setTextColor(100);
     doc.text(
@@ -139,6 +132,10 @@ const Allappointments = () => {
     setIsModalVisible(false);
     setSelectedAppointment(null);
   };
+
+  const filteredAppointments = allappointments.filter((appointment) =>
+    appointment.userId?.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const columns = [
     {
@@ -178,7 +175,7 @@ const Allappointments = () => {
         const status = text?.toLowerCase().trim();
         const isPending = status === "pending";
         const isApproved = status === "approve";
-    
+
         return (
           <span
             className={`px-3 py-1 rounded-full text-white font-semibold inline-flex items-center gap-2 ${
@@ -202,37 +199,47 @@ const Allappointments = () => {
                 type="primary"
                 onClick={() => generatePDF(record)}
                 icon={<DownloadOutlined />}
-              ></Button>
+              />
             </Tooltip>
           )}
           <Tooltip title="View Profile">
             <Button
               type="default"
               onClick={() => showProfileModal(record)}
-              className="border-gray-500"
               icon={<AliwangwangOutlined />}
-            ></Button>
+            />
           </Tooltip>
           <Button
-            className="px-4 py-2 bg-gray-600 rounded-lg hover:bg-gray-700 transition cursor-pointer"
             onClick={() => handleAppointments(record._id)}
             type="dashed"
             icon={<DeleteOutlined />}
-          ></Button>
+            danger
+          />
         </div>
       ),
     },
   ];
+
   return (
     <Layout>
-      <div className="max-w-6xl mx-auto p-6 bg-white shadow-lg rounded-lg mt-6">
-        <h1 className='text-2xl font-bold text-gray-800 mb-4 text-center"'>
+      <div className="p-6 bg-white shadow-lg rounded-lg">
+        <h1 className="text-3xl font-extrabold text-gray-800 mb-4 ">
           All Appointments
         </h1>
+
+        <div className="flex justify-between items-center mb-4">
+          <input
+            placeholder="Search by user name..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="border px-3 py-1 rounded-md w-1/3"
+          />
+        </div>
+
         <div className="overflow-x-auto">
           <Table
             columns={columns}
-            dataSource={allappointments}
+            dataSource={filteredAppointments}
             pagination={{ pageSize: 6 }}
             rowKey="_id"
             className="w-full border border-gray-200 rounded-lg"

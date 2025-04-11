@@ -1,9 +1,22 @@
 import React, { useEffect, useState } from "react";
 import Layout from "../../components/Layout";
-import { Button, Descriptions, message, Modal, Table, Tooltip } from "antd";
+import {
+  Button,
+  Descriptions,
+  message,
+  Modal,
+  Table,
+  Tooltip,
+  Tag,
+} from "antd";
 import moment from "moment";
 import axios from "axios";
-import { AliwangwangOutlined, CheckCircleOutlined, DeleteOutlined, LoadingOutlined } from "@ant-design/icons";
+import {
+  AliwangwangOutlined,
+  CheckCircleOutlined,
+  DeleteOutlined,
+  LoadingOutlined,
+} from "@ant-design/icons";
 import API_ENDPOINTS from "../../api/endpoints";
 
 const DoctorAppointments = () => {
@@ -52,7 +65,6 @@ const DoctorAppointments = () => {
     }
   };
 
-  //deleteappointments
   const handleAppointments = async (appointmentId) => {
     try {
       const res = await axios.delete(
@@ -64,10 +76,8 @@ const DoctorAppointments = () => {
 
       if (res.data.success) {
         message.success(res.data.message);
-        setAppointments((prevAppointments) =>
-          prevAppointments.filter(
-            (appointment) => appointment._id !== appointmentId
-          )
+        setAppointments((prev) =>
+          prev.filter((appointment) => appointment._id !== appointmentId)
         );
       }
     } catch (error) {
@@ -86,84 +96,89 @@ const DoctorAppointments = () => {
     setSelectedAppointment(null);
   };
 
+  const renderStatusTag = (status) => {
+    const lower = status?.toLowerCase().trim();
+    if (lower === "pending") {
+      return (
+        <Tag color="gold" icon={<LoadingOutlined />}>
+          Pending
+        </Tag>
+      );
+    } else if (lower === "approve") {
+      return (
+        <Tag color="green" icon={<CheckCircleOutlined />}>
+          Approved
+        </Tag>
+      );
+    } else {
+      return <Tag color="red">{status}</Tag>;
+    }
+  };
+
   const columns = [
     {
-      title: "ID",
+      title: "Appointment ID",
       dataIndex: "_id",
+      width: 120,
+      ellipsis: true,
     },
     {
       title: "Patient Name",
       dataIndex: "userId",
-      render: (text, record) => <span>{record.userId.name}</span>,
+      render: (text, record) => <span>{record.userId?.name}</span>,
     },
     {
-      title: "Patient Email",
-      dataIndex: "userId",
-      render: (text, record) => <span>{record.userId.email}</span>,
+      title: "Email",
+      dataIndex: "userId.email",
+      render: (text, record) => <span>{record.userId?.email}</span>,
     },
     {
       title: "Date & Time",
       dataIndex: "date",
-      render: (text, record) => (
+      render: (_, record) => (
         <span>{moment(record.date).format("DD-MM-YYYY HH:mm")}</span>
       ),
     },
     {
       title: "Status",
       dataIndex: "status",
-      render: (text) => {
-        const status = text?.toLowerCase().trim();
-        const isPending = status === "pending";
-        const isApproved = status === "approve";
-    
-        return (
-          <span
-            className={`px-3 py-1 rounded-full text-white font-semibold inline-flex items-center gap-2 ${
-              isPending ? "bg-yellow-500" : "bg-green-500"
-            }`}
-          >
-            {isPending && <LoadingOutlined />}
-            {isApproved && <CheckCircleOutlined />}
-            {text}
-          </span>
-        );
-      },
+      render: (text) => renderStatusTag(text),
     },
     {
       title: "Actions",
       dataIndex: "actions",
-      render: (text, record) => (
-        <div className="flex text-white">
+      render: (_, record) => (
+        <div className="flex flex-wrap gap-2">
           {record.status === "pending" && (
-            <div className="flex gap-0.5">
-              <button
-                className="px-4 py-2 bg-green-600 rounded-lg hover:bg-green-700 transition cursor-pointer"
+            <>
+              <Button
+                className="bg-green-600 text-white hover:bg-green-700"
                 onClick={() => handleStatus(record, "approve")}
               >
                 Approve
-              </button>
-              <button
-                className="px-4 py-2 bg-red-600 rounded-lg hover:bg-red-700 transition cursor-pointer"
+              </Button>
+              <Button
+                className="bg-red-600 text-white hover:bg-red-700"
                 onClick={() => handleStatus(record, "rejected")}
               >
                 Reject
-              </button>
-            </div>
+              </Button>
+            </>
           )}
-          <Tooltip title="View Profile">
+          <Tooltip title="View Patient Profile">
             <Button
-              type="default"
-              onClick={() => showProfileModal(record)}
-              className="border-gray-500"
               icon={<AliwangwangOutlined />}
-            ></Button>
+              onClick={() => showProfileModal(record)}
+            />
           </Tooltip>
-             <Button
-                      className="px-4 py-2 bg-gray-600 rounded-lg hover:bg-gray-700 transition cursor-pointer"
-                      onClick={() => handleAppointments(record._id)}
-                      type="dashed"
-                      icon={<DeleteOutlined />}
-                    ></Button>
+          <Tooltip title="Delete Appointment">
+            <Button
+              danger
+              type="text"
+              icon={<DeleteOutlined />}
+              onClick={() => handleAppointments(record._id)}
+            />
+          </Tooltip>
         </div>
       ),
     },
@@ -171,40 +186,41 @@ const DoctorAppointments = () => {
 
   return (
     <Layout>
-      <div className="max-w-5xl mx-auto p-6 bg-white shadow-lg rounded-lg">
-        <h1 className="text-2xl font-semibold mb-4 text-center">
+      <div className="max-w-6xl mx-auto p-6 bg-white shadow-xl rounded-xl mt-6">
+        <h1 className="text-3xl font-bold text-center mb-6 text-gray-800">
           Doctor Appointments
         </h1>
         <Table
           columns={columns}
           dataSource={appointments}
           rowKey="_id"
-          className="shadow-lg"
+          pagination={{ pageSize: 5 }}
+          className="rounded-xl"
         />
       </div>
+
       <Modal
-        visible={isModalVisible}
-        title="Profile Details"
+        open={isModalVisible}
+        title="Patient Details"
         footer={null}
         onCancel={handleCloseModal}
       >
         {selectedAppointment && (
           <Descriptions bordered column={1} size="small">
-            <Descriptions.Item label="User Name">
+            <Descriptions.Item label="Patient Name">
               {selectedAppointment.userId?.name || "N/A"}
             </Descriptions.Item>
-            <Descriptions.Item label="User Email">
+            <Descriptions.Item label="Email">
               {selectedAppointment.userId?.email || "N/A"}
             </Descriptions.Item>
-
-            <Descriptions.Item label="Appointment Date">
+            <Descriptions.Item label="Date">
               {moment(selectedAppointment.date).format("DD-MM-YYYY")}
             </Descriptions.Item>
             <Descriptions.Item label="Time">
               {moment(selectedAppointment.date).format("HH:mm")}
             </Descriptions.Item>
             <Descriptions.Item label="Status">
-              {selectedAppointment.status}
+              {renderStatusTag(selectedAppointment.status)}
             </Descriptions.Item>
           </Descriptions>
         )}

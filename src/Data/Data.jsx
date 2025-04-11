@@ -36,7 +36,10 @@ export const ADMIN_MENU = [
     path: "/admin/users",
     
   },
-  
+  {
+    name:"Change User Status",
+    path:"/admin/changestatus",
+  },
   {
     name: "List of Users applied for medical certificate",
     path: "/usersforcertificate",

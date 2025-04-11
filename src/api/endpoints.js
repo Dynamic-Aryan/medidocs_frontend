@@ -22,6 +22,7 @@ const API_ENDPOINTS = {
   userMedicalCertificateStatus: `${BASE_URL}/user/usermedicalcertificatestatus`,
   userMedicalCertNoOfSubmissions: `${BASE_URL}/user/usermedicalcertificatenoofsubmissions`,
   updateUserProfile: `${BASE_URL}/user/updateprofileuser`,
+  getApprovedDoctors: `${BASE_URL}/user/approved-doctors`,
 
   //   doctor
   getDoctorById: `${BASE_URL}/doctor/getDoctorById`,
@@ -43,7 +44,8 @@ const API_ENDPOINTS = {
   adminGetAllUsers: `${BASE_URL}/admin/getallusers`,
   deleteUser: (userId) => `${BASE_URL}/admin/deleteuser/${userId}`,
   allAppointments:`${BASE_URL}/admin/adminappointments`,
-  deleteAppointmentByAdmin:(appointmentId)=>`${BASE_URL}/admin/delete-appointment/${appointmentId}`
+  deleteAppointmentByAdmin:(appointmentId)=>`${BASE_URL}/admin/delete-appointment/${appointmentId}`,
+  changeUserRole: `${BASE_URL}/admin/changeuserrole`,
 };
 
 export default API_ENDPOINTS;

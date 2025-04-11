@@ -12,37 +12,27 @@ const Usercertificateinfo = () => {
 
   const getCertificates = async () => {
     try {
-      const res = await axios.get(
-        API_ENDPOINTS.userMedicalCertificateStatus,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
+      const res = await axios.get(API_ENDPOINTS.userMedicalCertificateStatus, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
       if (res.data.success) {
         setCertificates(res.data.data);
-        setCertificateCount(res.data.data.length); // Set the count dynamically
+        setCertificateCount(res.data.data.length);
       }
     } catch (error) {
       console.log(error);
     }
   };
 
-  useEffect(() => {
-    getCertificates();
-  }, []);
-
   const getUserCertificateNo = async () => {
     try {
-      const res = await axios.get(
-        API_ENDPOINTS.userMedicalCertNoOfSubmissions,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
+      const res = await axios.get(API_ENDPOINTS.userMedicalCertNoOfSubmissions, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
       if (res.data.success) {
         setCertificateUser(res.data.data);
       }
@@ -52,6 +42,7 @@ const Usercertificateinfo = () => {
   };
 
   useEffect(() => {
+    getCertificates();
     getUserCertificateNo();
   }, []);
 
@@ -59,32 +50,32 @@ const Usercertificateinfo = () => {
     {
       title: "Name",
       dataIndex: "name",
-      className: "text-lg font-semibold text-gray-700",
+      render: (text) => <span className="font-semibold text-gray-800">{text}</span>,
     },
     {
       title: "Email",
       dataIndex: "email",
-      className: "text-gray-600",
+      render: (text) => <span className="text-gray-600">{text}</span>,
     },
     {
       title: "Gender",
       dataIndex: "gender",
-      className: "text-gray-600",
+      render: (text) => <span className="text-gray-600">{text}</span>,
     },
     {
       title: "Duration",
       dataIndex: "duration",
-      className: "text-gray-600",
+      render: (text) => <span className="text-gray-600">{text}</span>,
     },
     {
       title: "Reason",
       dataIndex: "reason",
-      className: "text-gray-600",
+      render: (text) => <span className="text-gray-600">{text}</span>,
     },
     {
       title: "Symptoms",
       dataIndex: "symptoms",
-      className: "text-gray-600",
+      render: (text) => <span className="text-gray-600">{text}</span>,
     },
     {
       title: "Status",
@@ -92,11 +83,10 @@ const Usercertificateinfo = () => {
       render: (text) => {
         const isPending = text === "Pending";
         const isApproved = text === "Approved";
-    
         return (
           <span
-            className={`px-3 py-1 rounded-full text-white inline-flex items-center gap-2 ${
-              isPending ? "bg-yellow-500" : "bg-green-500"
+            className={`px-3 py-1 rounded-full font-medium text-white inline-flex items-center gap-2 ${
+              isPending ? "bg-yellow-500" : isApproved ? "bg-green-500" : "bg-gray-500"
             }`}
           >
             {isPending && <LoadingOutlined />}
@@ -109,8 +99,7 @@ const Usercertificateinfo = () => {
     {
       title: "Approved By",
       dataIndex: "signature",
-      className: "text-gray-600",
-      render: (text) => <span className="italic text-gray-600">Dr {text}</span>,
+      render: (text) => <span className="italic text-gray-700">Dr {text}</span>,
     },
     {
       title: "Certificate",
@@ -118,46 +107,51 @@ const Usercertificateinfo = () => {
       render: (text, record) =>
         record.status === "Approved" ? (
           <a
-            href={'/certificates'}
+            href="/certificates"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-blue-500 underline"
+            className="text-blue-600 underline hover:text-blue-800 transition"
           >
             Download PDF
           </a>
         ) : (
-          <span className="text-gray-500">Not Available</span>
+          <span className="text-gray-400 italic">Not Available</span>
         ),
     },
   ];
 
   return (
     <Layout>
-      <div className="max-w-6xl mx-auto p-6 bg-white shadow-lg rounded-lg mt-6">
-        <h1 className="text-2xl font-bold text-gray-800 mb-4 text-center">
+      <div className="max-w-7xl mx-auto p-6 bg-white shadow-xl rounded-2xl mt-8">
+        <h1 className="text-3xl font-bold text-center text-gray-800 mb-6">
           Medical Certificate Requests
         </h1>
 
-        {/* Certificate Count */}
-        <div className="mb-4 p-4 bg-gray-100 rounded-lg shadow-sm text-center">
-          <h2 className="text-lg font-semibold text-gray-700">
-            Total Certificates Applied: {certificateCount}
-          </h2>
-        </div>
-        {/* User's Certificate Submission Count */}
-        <div className="mb-4 p-4 bg-gray-100 rounded-lg shadow-sm text-center">
-          <h2 className="text-lg font-semibold text-gray-700">
-            Your Total Submissions: {certificateUser.count || 0}
-          </h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          <div className="bg-gray-100 p-4 rounded-xl shadow-sm text-center">
+            <h2 className="text-lg font-semibold text-gray-700">
+              Total Certificates Applied
+            </h2>
+            <p className="text-2xl font-bold text-blue-600 mt-1">{certificateCount}</p>
+          </div>
+
+          <div className="bg-gray-100 p-4 rounded-xl shadow-sm text-center">
+            <h2 className="text-lg font-semibold text-gray-700">
+              Your Total Submissions
+            </h2>
+            <p className="text-2xl font-bold text-indigo-600 mt-1">
+              {certificateUser.count || 0}
+            </p>
+          </div>
         </div>
 
-        {/* Certificate Table */}
         <div className="overflow-x-auto">
           <Table
             columns={columns}
             dataSource={certificates}
             pagination={{ pageSize: 5 }}
-            className="w-full border border-gray-200 rounded-lg"
+            rowKey="_id"
+            className="rounded-xl"
           />
         </div>
       </div>
