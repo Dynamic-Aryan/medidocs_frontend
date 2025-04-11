@@ -1,9 +1,28 @@
 import React, { useEffect, useState } from "react";
 import Layout from "../../components/Layout";
 import axios from "axios";
-import { Button, Descriptions, message, Modal, Table, Tooltip } from "antd";
-import { AliwangwangOutlined, CheckCircleOutlined, DeleteOutlined, LoadingOutlined } from "@ant-design/icons";
+import {
+  Button,
+  Descriptions,
+  message,
+  Modal,
+  Table,
+  Tooltip,
+  Input,
+  Select,
+  Typography,
+} from "antd";
+import {
+  AliwangwangOutlined,
+  CheckCircleOutlined,
+  DeleteOutlined,
+  LoadingOutlined,
+  SearchOutlined,
+} from "@ant-design/icons";
 import API_ENDPOINTS from "../../api/endpoints";
+
+const { Title } = Typography;
+const { Option } = Select;
 
 const Doctors = () => {
   const [doctors, setDoctors] = useState([]);
@@ -93,7 +112,7 @@ const Doctors = () => {
     {
       title: "Name",
       dataIndex: "name",
-      render: (text, record) => (
+      render: (_, record) => (
         <span className="font-medium text-gray-700">
           {record.firstName} {record.lastName}
         </span>
@@ -102,12 +121,10 @@ const Doctors = () => {
     {
       title: "Email",
       dataIndex: "email",
-      className: "text-gray-600",
     },
     {
       title: "Specialization",
       dataIndex: "specialization",
-      className: "text-gray-600 font-medium",
     },
     {
       title: "Status",
@@ -115,7 +132,7 @@ const Doctors = () => {
       render: (text) => {
         const status = text?.toLowerCase().trim();
         const isPending = status === "pending";
-        const isApproved = status === "approve";
+        const isApproved = status === "approved";
 
         return (
           <span
@@ -133,40 +150,39 @@ const Doctors = () => {
     {
       title: "Phone",
       dataIndex: "phone",
-      className: "text-gray-600",
     },
     {
       title: "Actions",
-      dataIndex: "actions",
-      render: (text, record) => (
-        <div className="flex gap-1">
+      render: (_, record) => (
+        <div className="flex gap-2">
           <Tooltip title="View Profile">
             <Button
-              type="default"
-              onClick={() => showProfileModal(record)}
-              className="border-gray-500"
               icon={<AliwangwangOutlined />}
-            ></Button>
+              onClick={() => showProfileModal(record)}
+            />
           </Tooltip>
           {record.status === "pending" ? (
-            <button
-              className="px-3 py-1 bg-green-600 text-white rounded-md hover:bg-green-700 transition-all"
+            <Button
+              type="primary"
+              className="bg-green-600"
               onClick={() => handleAccountStatus(record, "approved")}
             >
               Approve
-            </button>
+            </Button>
           ) : (
-            <button
-              className="px-3 py-1 bg-red-600 text-white rounded-md hover:bg-red-700 transition-all cursor-pointer"
+            <Button
+              danger
               onClick={() => handleAccountStatus(record, "rejected")}
             >
               Reject
-            </button>
+            </Button>
           )}
-          <DeleteOutlined
-            className="text-red-600 text-lg cursor-pointer hover:text-red-800 transition-all"
-            onClick={() => handleDeleteDoctor(record._id)}
-          />
+          <Tooltip title="Delete Doctor">
+            <DeleteOutlined
+              className="text-red-600 text-lg cursor-pointer hover:text-red-800"
+              onClick={() => handleDeleteDoctor(record._id)}
+            />
+          </Tooltip>
         </div>
       ),
     },
@@ -174,40 +190,44 @@ const Doctors = () => {
 
   return (
     <Layout>
-      <div className="p-6 bg-white shadow-lg rounded-lg">
-        <h1 className="text-3xl font-extrabold text-gray-800 mb-4">Doctors</h1>
-        <div className="flex justify-between items-center mb-4">
-          <input
-            placeholder="Search by name or email"
-            className="border px-3 py-1 rounded-md w-1/3"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-          <select
-            className="border px-3 py-1 rounded-md"
-            onChange={(e) => setStatusFilter(e.target.value)}
-            value={statusFilter}
-          >
-            <option value="">All Statuses</option>
-            <option value="pending">Pending</option>
-            <option value="approved">Approved</option>
-            <option value="rejected">Rejected</option>
-          </select>
+      <div className="p-4">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+          <Title level={3} className="mb-0">
+            Manage Doctors
+          </Title>
+          <div className="flex gap-2 flex-wrap">
+            <Input
+              placeholder="Search by name"
+              prefix={<SearchOutlined />}
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              style={{ width: 220 }}
+            />
+            <Select
+              value={statusFilter}
+              onChange={(value) => setStatusFilter(value)}
+              style={{ width: 180 }}
+              placeholder="Filter by status"
+            >
+              <Option value="">All Statuses</Option>
+              <Option value="pending">Pending</Option>
+              <Option value="approved">Approved</Option>
+              <Option value="rejected">Rejected</Option>
+            </Select>
+          </div>
         </div>
-        <div className="overflow-x-auto">
-          <Table
-            columns={columns}
-            dataSource={filteredDoctors}
-            className="w-full border rounded-lg shadow-sm"
-            pagination={{ pageSize: 5 }}
-            rowKey="_id"
-          />
-        </div>
+
+        <Table
+          columns={columns}
+          dataSource={filteredDoctors}
+          rowKey="_id"
+          pagination={{ pageSize: 6 }}
+        />
       </div>
 
       <Modal
         title="Doctor Profile"
-        visible={isModalVisible}
+        open={isModalVisible}
         onCancel={handleCloseModal}
         footer={null}
         width={800}

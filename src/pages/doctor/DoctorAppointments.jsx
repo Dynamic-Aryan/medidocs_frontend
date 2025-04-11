@@ -8,6 +8,8 @@ import {
   Table,
   Tooltip,
   Tag,
+  Typography,
+  Input,
 } from "antd";
 import moment from "moment";
 import axios from "axios";
@@ -16,13 +18,17 @@ import {
   CheckCircleOutlined,
   DeleteOutlined,
   LoadingOutlined,
+  SearchOutlined,
 } from "@ant-design/icons";
 import API_ENDPOINTS from "../../api/endpoints";
+
+const { Title } = Typography;
 
 const DoctorAppointments = () => {
   const [appointments, setAppointments] = useState([]);
   const [selectedAppointment, setSelectedAppointment] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const getAppointments = async () => {
     try {
@@ -95,6 +101,11 @@ const DoctorAppointments = () => {
     setIsModalVisible(false);
     setSelectedAppointment(null);
   };
+
+  const filteredAppointments = appointments.filter((appointment) =>
+    appointment.userId?.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
 
   const renderStatusTag = (status) => {
     const lower = status?.toLowerCase().trim();
@@ -186,27 +197,39 @@ const DoctorAppointments = () => {
 
   return (
     <Layout>
-      <div className="max-w-6xl mx-auto p-6 bg-white shadow-xl rounded-xl mt-6">
-        <h1 className="text-3xl font-bold text-center mb-6 text-gray-800">
-          Doctor Appointments
-        </h1>
-        <Table
+     <div className="p-4">
+     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+     <Title level={3} className="mb-0">
+            Doctor Appointments
+          </Title>
+          <div className="flex gap-2 flex-wrap">
+            <Input
+              placeholder="Search by user name..."
+              prefix={<SearchOutlined />}
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              style={{ width: 220 }}
+            />
+          </div>
+      </div>
+     </div>
+     <Table
           columns={columns}
-          dataSource={appointments}
+          dataSource={filteredAppointments}
           rowKey="_id"
           pagination={{ pageSize: 5 }}
-          className="rounded-xl"
+          
         />
-      </div>
 
       <Modal
         open={isModalVisible}
         title="Patient Details"
         footer={null}
         onCancel={handleCloseModal}
+        width={800}
       >
         {selectedAppointment && (
-          <Descriptions bordered column={1} size="small">
+          <Descriptions bordered column={1} size="small" labelStyle={{ fontWeight: "bold", width: "30%" }} >
             <Descriptions.Item label="Patient Name">
               {selectedAppointment.userId?.name || "N/A"}
             </Descriptions.Item>

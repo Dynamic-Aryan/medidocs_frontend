@@ -7,10 +7,13 @@ import {
   Tooltip,
   Button,
   Descriptions,
-  Input
+  Input,
+  Typography
 } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import API_ENDPOINTS from '../../api/endpoints';
+
+const { Title } = Typography;
 
 const Medicalcertusers = () => {
   const [users, setUsers] = useState([]);
@@ -119,33 +122,39 @@ const Medicalcertusers = () => {
 
   return (
     <Layout>
-      <div className="p-6 bg-white shadow-lg rounded-lg">
-      <h1 className="text-3xl font-extrabold text-gray-800">Users Certificate Details</h1>
-        <div className="flex justify-between items-center mb-4">
+    <div className='p-4'>
+    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+    <Title level={3} className="mb-0">
+            User certificate Details
+          </Title>
+        <div className="flex gap-2 flex-wrap">
   
-          <input
+          <Input
             placeholder="Search by name, email or reason"
-             className="border px-3 py-1 rounded-md w-1/3"
+             prefix={<SearchOutlined />}
             value={searchText}
             onChange={(e) => handleSearch(e.target.value)}
+            style={{ width: 220 }}
             
           />
         </div>
-        <div className="overflow-x-auto">
+      
+      </div>
+     
           <Table
             columns={columns}
             dataSource={filteredUsers}
-            className="w-full border rounded-lg shadow-sm"
+            
             pagination={{ pageSize: 5 }}
             rowKey="_id"
           />
-        </div>
-      </div>
+       
+    </div>
 
       {/* Profile Modal */}
       <Modal
         title="User Profile"
-        visible={isModalVisible}
+        open={isModalVisible}
         onCancel={handleCloseModal}
         footer={null}
         width={700}

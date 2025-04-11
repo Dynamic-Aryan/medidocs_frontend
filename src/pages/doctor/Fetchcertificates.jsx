@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
 import Layout from "../../components/Layout";
 import axios from "axios";
-import { Button, Table, Modal, Input, message } from "antd";
+import { Button, Table, Modal, Input, message, Typography } from "antd";
 import { DeleteOutlined, SearchOutlined } from "@ant-design/icons";
 import API_ENDPOINTS from "../../api/endpoints";
+
+const { Title } = Typography;
 
 const Fetchcertificates = () => {
   const [certificates, setCertificates] = useState([]);
@@ -185,29 +187,33 @@ const Fetchcertificates = () => {
 
   return (
     <Layout>
-      <div className="p-6 bg-white shadow-lg rounded-lg">
-        <h1 className="text-3xl font-extrabold text-gray-800 mb-4">
-          Manage Certificates
-        </h1>
+    <div className="p-4">
+    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+    <Title level={3} className="mb-0">
+            Manage Certificates
+          </Title>
 
         {/* 🔍 Search Input */}
-        <div className="flex justify-between items-center mb-4">
-          <input
+        <div className="flex gap-2 flex-wrap">
+          <Input
             placeholder="Search by name..."
-            className="border px-3 py-1 rounded-md w-1/3"
+             prefix={<SearchOutlined />}
+             style={{ width: 220 }}
             value={searchTerm}
             onChange={(e) => handleSearch(e.target.value)}
           />
         </div>
 
-        <div className="bg-white rounded shadow-md p-4">
+       
+      </div>
+      
           <Table
             columns={columns}
             dataSource={filteredCertificates}
             rowKey="_id"
-            className="overflow-x-auto"
+            pagination={{ pageSize: 6 }}
           />
-        </div>
+       
 
         <Modal
           title="Add Your Signature"
@@ -231,7 +237,7 @@ const Fetchcertificates = () => {
             className="mt-1"
           />
         </Modal>
-      </div>
+    </div>
     </Layout>
   );
 };

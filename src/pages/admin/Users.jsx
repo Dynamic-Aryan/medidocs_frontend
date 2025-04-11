@@ -1,9 +1,20 @@
 import React, { useEffect, useState } from "react";
 import Layout from "../../components/Layout";
 import axios from "axios";
-import { Table, Button, message, Popconfirm, Tooltip, Tag, Input } from "antd";
+import {
+  Table,
+  Button,
+  message,
+  Popconfirm,
+  Tooltip,
+  Tag,
+  Input,
+  Typography,
+} from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import API_ENDPOINTS from "../../api/endpoints";
+
+const { Title } = Typography;
 
 const Users = () => {
   const [users, setUsers] = useState([]);
@@ -114,25 +125,28 @@ const Users = () => {
 
   return (
     <Layout>
-      <div className="p-6 bg-white shadow-lg rounded-lg">
-        <h1 className="text-3xl font-extrabold text-gray-800 mb-4">Users</h1>
-        <div className="flex justify-between items-center mb-4">
-          <input
-            placeholder="Search by name or email"
-            className="border px-3 py-1 rounded-md w-1/3"
-            value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
-          />
+      <div className="p-4">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+          <Title level={3} className="mb-0">
+            Users
+          </Title>
+          <div className="flex gap-2 flex-wrap">
+            <Input
+              placeholder="Search by name or email"
+              prefix={<SearchOutlined />}
+              style={{ width: 220 }}
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+            />
+          </div>
         </div>
-        <div className="overflow-x-auto">
-          <Table
-            columns={columns}
-            dataSource={filteredUsers}
-            rowKey="_id"
-            pagination={{ pageSize: 6 }}
-            className="rounded-xl"
-          />
-        </div>
+        <Table
+          columns={columns}
+          dataSource={filteredUsers}
+          rowKey="_id"
+          pagination={{ pageSize: 6 }}
+          
+        />
       </div>
     </Layout>
   );

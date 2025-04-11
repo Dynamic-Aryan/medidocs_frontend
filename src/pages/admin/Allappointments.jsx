@@ -2,7 +2,17 @@ import React, { useEffect, useState } from "react";
 import Layout from "../../components/Layout";
 import API_ENDPOINTS from "../../api/endpoints";
 import axios from "axios";
-import { Button, Descriptions, message, Modal, Table, Tooltip } from "antd";
+import {
+  Button,
+  Descriptions,
+  Input,
+  message,
+  Modal,
+  Table,
+  Tooltip,
+  Typography,
+  Select
+} from "antd";
 import moment from "moment";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
@@ -12,7 +22,12 @@ import {
   DeleteOutlined,
   DownloadOutlined,
   LoadingOutlined,
+  SearchOutlined,
 } from "@ant-design/icons";
+
+
+const { Title } = Typography;
+
 
 const Allappointments = () => {
   const [allappointments, setAllappointments] = useState([]);
@@ -222,39 +237,44 @@ const Allappointments = () => {
 
   return (
     <Layout>
-      <div className="p-6 bg-white shadow-lg rounded-lg">
-        <h1 className="text-3xl font-extrabold text-gray-800 mb-4 ">
-          All Appointments
-        </h1>
+      <div className="p-4">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+          <Title level={3} className="mb-0">
+            All Appointments
+          </Title>
 
-        <div className="flex justify-between items-center mb-4">
-          <input
-            placeholder="Search by user name..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="border px-3 py-1 rounded-md w-1/3"
-          />
+          <div className="flex gap-2 flex-wrap">
+            <Input
+              placeholder="Search by user name..."
+              prefix={<SearchOutlined />}
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              style={{ width: 220 }}
+            />
+          </div>
         </div>
 
-        <div className="overflow-x-auto">
-          <Table
-            columns={columns}
-            dataSource={filteredAppointments}
-            pagination={{ pageSize: 6 }}
-            rowKey="_id"
-            className="w-full border border-gray-200 rounded-lg"
-          />
-        </div>
+        <Table
+          columns={columns}
+          dataSource={filteredAppointments}
+          pagination={{ pageSize: 6 }}
+          rowKey="_id"
+        />
       </div>
-
       <Modal
-        visible={isModalVisible}
+        open={isModalVisible}
         title="Profile Details"
         footer={null}
         onCancel={handleCloseModal}
+        width={800}
       >
         {selectedAppointment && (
-          <Descriptions bordered column={1} size="small">
+          <Descriptions
+            bordered
+            column={1}
+            size="small"
+            labelStyle={{ fontWeight: "bold", width: "30%" }}
+          >
             <Descriptions.Item label="User Name">
               {selectedAppointment.userId?.name || "N/A"}
             </Descriptions.Item>

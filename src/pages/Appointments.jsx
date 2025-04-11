@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import Layout from "../components/Layout";
 import axios from "axios";
 import moment from "moment";
-import { Table, Button, Tooltip, Input } from "antd";
+import { Table, Button, Tooltip, Input, Typography } from "antd";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import API_ENDPOINTS from "../api/endpoints";
@@ -11,6 +11,9 @@ import {
   CheckCircleOutlined,
   SearchOutlined,
 } from "@ant-design/icons";
+
+
+const { Title } = Typography;
 
 const Appointments = () => {
   const [appointments, setAppointments] = useState([]);
@@ -194,28 +197,32 @@ const Appointments = () => {
 
   return (
     <Layout>
-      <div className="p-6 bg-white shadow-lg rounded-lg">
-        <h1 className="text-2xl font-bold text-gray-800 mb-4">
-          Appointment History
-        </h1>
-        <div className="flex justify-between items-center mb-4">
-          <input
+      <div className="p-4">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+      <Title level={3} className="mb-0">
+             Appointment History
+          </Title>
+        <div className="flex gap-2 flex-wrap">
+          <Input
             placeholder="Search by name or email"
-            className="border px-3 py-1 rounded-md w-1/3"
+             prefix={<SearchOutlined />}
+             style={{ width: 220 }}
             value={searchText}
             onChange={(e) => setSearchText(e.target.value)}
           />
         </div>
 
-        <div className="overflow-x-auto">
+       
+      </div>
+     
           <Table
             columns={columns}
             dataSource={filteredAppointments}
             pagination={{ pageSize: 6 }}
             rowKey="_id"
-            className="rounded-xl"
+            
           />
-        </div>
+        
       </div>
     </Layout>
   );

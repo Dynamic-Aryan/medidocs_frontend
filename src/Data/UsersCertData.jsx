@@ -1,83 +1,70 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Card, Button, Modal, Descriptions } from 'antd';
+import { UserOutlined, EyeOutlined } from '@ant-design/icons';
 
 const UsersCertData = ({ user }) => {
-  const navigate = useNavigate();
+  const [isModalVisible, setIsModalVisible] = useState(false);
+
+  const showModal = () => setIsModalVisible(true);
+  const handleCancel = () => setIsModalVisible(false);
 
   return (
-    <div className="bg-white shadow-md hover:shadow-xl rounded-xl p-5 transition-transform transform  cursor-pointer border border-l-8 border-teal-600 mb-6">
-      <div className="bg-teal-500 text-white text-lg font-semibold py-3 px-4 rounded-t-xl text-center"
-      onClick={()=> navigate(`/user/leavestatus/${user._id}`)}
+    <>
+      <Card
+        title={
+          <div className="flex justify-between items-center">
+            <span className="font-semibold text-lg text-gray-800">
+              <UserOutlined className="mr-2 text-teal-600" />
+              {user.name}
+            </span>
+            <Button type="primary" icon={<EyeOutlined />} onClick={showModal}>
+              View Profile
+            </Button>
+          </div>
+        }
+        bordered={false}
+        className="shadow-md hover:shadow-lg rounded-xl border border-teal-100 transition-all duration-300"
       >
-        {user.name}
-      </div>
+        <p><b>Email:</b> {user.email}</p>
+        <p><b>Employer:</b> {user.employer}</p>
+        <p><b>Status:</b> {user.status}</p>
+      </Card>
 
-      {/* Body Content */}
-      <div className="p-5 space-y-3 text-gray-700">
-        <p className="text-md">
-          <b className="text-teal-600">Age:</b> {user.age}
-        </p>
-        <p className="text-md">
-          <b className="text-teal-600">Gender:</b> {user.gender}
-        </p>
-        <p className="text-md">
-          <b className="text-teal-600">Address:</b> {user.address}
-        </p>
-        <p className="text-md">
-          <b className="text-teal-600">Employer:</b> {user.employer}
-        </p>
-        <p className="text-md">
-          <b className="text-teal-600">Email:</b> {user.email}
-        </p>
-        <p className="text-md">
-          <b className="text-teal-600">Reason:</b> {user.reason}
-        </p>
-        <p className="text-md">
-          <b className="text-teal-600">Symptoms:</b> {user.symptoms}
-        </p>
-        <p className="text-md">
-          <b className="text-teal-600">Duration of Illness:</b> {user.durationOfIllness}
-        </p>
-        <p className="text-md">
-          <b className="text-teal-600">Medical History:</b> {user.medicalHistory}
-        </p>
-        <p className="text-md">
-          <b className="text-teal-600">Medications:</b> {user.medications}
-        </p>
-        <p className="text-md">
-          <b className="text-teal-600">Emergency Treatment:</b> {user.emergencyTreatment}
-        </p>
-        <p className="text-md">
-          <b className="text-teal-600">Previous Surgeries:</b> {user.previousSurgeries}
-        </p>
-        <p className="text-md">
-          <b className="text-teal-600">Family History:</b> {user.familyHistory}
-        </p>
-        <p className="text-md">
-          <b className="text-teal-600">Environmental Cause:</b> {user.environmentalCause}
-        </p>
-        <p className="text-md">
-          <b className="text-teal-600">Severity:</b> {user.severity}
-        </p>
-        <p className="text-md">
-          <b className="text-teal-600">Consultation Status:</b> {user.consultationStatus}
-        </p>
-        <p className="text-md">
-          <b className="text-teal-600">Certificate Purpose:</b> {user.certificatePurpose}
-        </p>
-        <p className="text-md">
-          <b className="text-teal-600">Status:</b> {user.status}
-        </p>
-
-        {/* Apply Link */}
-        {/* <button
-          onClick={() => navigate(`/user/certificatestatus/${user._id}`)}
-          className="mt-4 bg-cyan-500 text-white py-2 px-4 rounded-md hover:bg-cyan-600 transition duration-300 cursor-pointer"
+      <Modal
+        title={`Profile Details - ${user.name}`}
+        open={isModalVisible}
+        onCancel={handleCancel}
+        footer={null}
+        width={750}
+        centered
+      >
+        <Descriptions
+          column={2}
+          bordered
+          size="small"
+          labelStyle={{ fontWeight: 'bold', color: '#08979c' }}
         >
-          View Certificate Status
-        </button> */}
-      </div>
-    </div>
+          <Descriptions.Item label="Age">{user.age}</Descriptions.Item>
+          <Descriptions.Item label="Gender">{user.gender}</Descriptions.Item>
+          <Descriptions.Item label="Address" span={2}>{user.address}</Descriptions.Item>
+          <Descriptions.Item label="Employer">{user.employer}</Descriptions.Item>
+          <Descriptions.Item label="Email">{user.email}</Descriptions.Item>
+          <Descriptions.Item label="Reason" span={2}>{user.reason}</Descriptions.Item>
+          <Descriptions.Item label="Symptoms">{user.symptoms}</Descriptions.Item>
+          <Descriptions.Item label="Duration of Illness">{user.durationOfIllness}</Descriptions.Item>
+          <Descriptions.Item label="Medical History" span={2}>{user.medicalHistory}</Descriptions.Item>
+          <Descriptions.Item label="Medications">{user.medications}</Descriptions.Item>
+          <Descriptions.Item label="Emergency Treatment">{user.emergencyTreatment}</Descriptions.Item>
+          <Descriptions.Item label="Previous Surgeries">{user.previousSurgeries}</Descriptions.Item>
+          <Descriptions.Item label="Family History">{user.familyHistory}</Descriptions.Item>
+          <Descriptions.Item label="Environmental Cause">{user.environmentalCause}</Descriptions.Item>
+          <Descriptions.Item label="Severity">{user.severity}</Descriptions.Item>
+          <Descriptions.Item label="Consultation Status">{user.consultationStatus}</Descriptions.Item>
+          <Descriptions.Item label="Certificate Purpose">{user.certificatePurpose}</Descriptions.Item>
+          <Descriptions.Item label="Status">{user.status}</Descriptions.Item>
+        </Descriptions>
+      </Modal>
+    </>
   );
 };
 

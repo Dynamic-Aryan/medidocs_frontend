@@ -164,7 +164,12 @@ const MedicalCertificateForm = () => {
             <Form.Item
               label="Are you an employer"
               name="employer"
-              rules={[{ required: true, message: "Please enter your employment status" }]}
+              rules={[
+                {
+                  required: true,
+                  message: "Please enter your employment status",
+                },
+              ]}
             >
               <Input placeholder="Enter your employment status" />
             </Form.Item>
@@ -204,14 +209,21 @@ const MedicalCertificateForm = () => {
             <Form.Item
               label="Duration of illness"
               name="durationOfIllness"
-              rules={[{ required: true, message: "Please enter duration of illness" }]}
+              rules={[
+                { required: true, message: "Please enter duration of illness" },
+              ]}
             >
               <Input type="number" placeholder="e.g., 3" />
             </Form.Item>
             <Form.Item
               label="Medical history"
               name="medicalHistory"
-              rules={[{ required: true, message: "Please enter your medical history" }]}
+              rules={[
+                {
+                  required: true,
+                  message: "Please enter your medical history",
+                },
+              ]}
             >
               <Input placeholder="Enter your medical history" />
             </Form.Item>
@@ -225,7 +237,12 @@ const MedicalCertificateForm = () => {
             <Form.Item
               label="Emergency Treatment"
               name="emergencyTreatment"
-              rules={[{ required: true, message: "Please enter emergency treatment details" }]}
+              rules={[
+                {
+                  required: true,
+                  message: "Please enter emergency treatment details",
+                },
+              ]}
             >
               <Input placeholder="Emergency treatment info" />
             </Form.Item>
@@ -239,14 +256,18 @@ const MedicalCertificateForm = () => {
             <Form.Item
               label="Family History"
               name="familyHistory"
-              rules={[{ required: true, message: "Please enter family history" }]}
+              rules={[
+                { required: true, message: "Please enter family history" },
+              ]}
             >
               <Input placeholder="Family medical history" />
             </Form.Item>
             <Form.Item
               label="Environmental Cause"
               name="environmentalCause"
-              rules={[{ required: true, message: "Please enter environmental cause" }]}
+              rules={[
+                { required: true, message: "Please enter environmental cause" },
+              ]}
             >
               <Input placeholder="Environmental cause (if any)" />
             </Form.Item>
@@ -266,7 +287,9 @@ const MedicalCertificateForm = () => {
             <Form.Item
               label="Consultation Status"
               name="consultationStatus"
-              rules={[{ required: true, message: "Please select consultation type" }]}
+              rules={[
+                { required: true, message: "Please select consultation type" },
+              ]}
             >
               <Select placeholder="Choose consultation type">
                 {consultationStatus.map((status, index) => (
@@ -279,7 +302,9 @@ const MedicalCertificateForm = () => {
             <Form.Item
               label="Certificate Purpose"
               name="certificatePurpose"
-              rules={[{ required: true, message: "Please enter certificate purpose" }]}
+              rules={[
+                { required: true, message: "Please enter certificate purpose" },
+              ]}
             >
               <Input placeholder="Purpose of the certificate" />
             </Form.Item>
