@@ -121,7 +121,7 @@ const BookingPage = () => {
                   Dr. {doctors.firstName} {doctors.lastName}
                 </h3>
                 <p className="text-gray-600">Fees: ${doctors.feesPerConsultation}</p>
-                <p className="text-gray-600">Timings: {doctors.timings}</p>
+                {/* <p className="text-gray-600">Timings: {doctors.timings}</p> */}
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
@@ -148,11 +148,7 @@ const BookingPage = () => {
                 </div>
               </div>
 
-              {isAvailable !== null && (
-                <div className={`mt-4 text-center text-lg font-semibold ${isAvailable ? "text-green-600" : "text-red-500"}`}>
-                  {isAvailable ? "Time Slot is Available" : "Time Slot Unavailable"}
-                </div>
-              )}
+           
 
               <div className="mt-6 flex flex-col md:flex-row gap-4">
                 <button
