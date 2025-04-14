@@ -196,7 +196,7 @@ const BookingPage = () => {
       </div>
 
       <Modal
-        title="🔐 Dummy Payment Gateway"
+        title="🔐 Payment Gateway"
         open={isModalVisible}
         onCancel={() => setIsModalVisible(false)}
         footer={null}

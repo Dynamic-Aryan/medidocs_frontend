@@ -66,7 +66,7 @@ const Usercertificate = () => {
       message.error("❌ Invalid UPI ID. Use format like 9876543210@okaxis");
       return;
     }
-    message.success("✅ Dummy payment successful!");
+    message.success("✅ Payment successful!");
     setUpiModalVisible(false);
     setShowPdfStyleModal(true);
     setUpiInput("");
