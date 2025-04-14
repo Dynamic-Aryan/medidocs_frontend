@@ -3,6 +3,8 @@ import { ADMIN_MENU } from "../Data/Data";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { Badge, message } from "antd";
+import Medidocs from "../assets/medidocs.webp";
+import Logo from "../assets/aryanmd.webp";
 
 const Layout = ({ children }) => {
   const { user } = useSelector((state) => state.user);
@@ -100,12 +102,23 @@ const Layout = ({ children }) => {
       {/* Sidebar */}
       <div className="w-72 bg-gradient-to-b from-teal-600 to-teal-800 text-white shadow-xl p-6 flex flex-col">
         {/* Logo Section */}
-        <div className="flex flex-col items-center mb-10">
-          <h6 className="text-[14px] md:text-3xl font-extrabold tracking-widest text-center text-white">
-            ＜MEDIDOC＞
-          </h6>
-          <hr className="w-full border-gray-300 my-6" />
+        <hr className="w-full border-gray-300 my-6" />
+        <div className="flex flex-row items-center mb-10 ">
+            <img
+              src={Logo}
+              alt="MediDocs Icon"
+              className="h-8 w-8 md:h-12 md:w-12 object-cover rounded-full "
+            />
+            
+            <img
+              src={Medidocs}
+              alt="MEDIDOCS Logo"
+              className="mx-auto h-10 md:h-16 object-contain -ml-5"
+            />
+          
+          <hr className="w-full border-gray-300 my-2" />
         </div>
+       
 
         {/* Navigation Links */}
         <nav className="flex flex-col  flex-grow space-y-0.5">

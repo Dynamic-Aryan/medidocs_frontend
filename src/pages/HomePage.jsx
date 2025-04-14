@@ -51,13 +51,130 @@ const HomePage = () => {
     );
   }
 
+  const renderAdminDashboard = () => (
+    <div className="bg-white p-6 rounded-xl shadow-md">
+      <Title level={4} className="mb-6 text-center text-gray-700">
+        Admin Controls & Management Panel
+      </Title>
+      <Row gutter={[24, 24]}>
+        <Col xl={8} md={12} sm={24}>
+          <Card
+            title="All Appointments"
+            bordered={false}
+            hoverable
+            className="rounded-2xl shadow-lg transition-all duration-300"
+            actions={[
+              <Button type="primary" onClick={() => navigate("/admin/allappointments")}>
+                View
+              </Button>,
+            ]}
+          >
+            <FaCalendarCheck className="text-blue-500 text-5xl mb-4" />
+            <Text type="secondary">Monitor all user appointments</Text>
+          </Card>
+        </Col>
+  
+        <Col xl={8} md={12} sm={24}>
+          <Card
+            title="All Doctors"
+            bordered={false}
+            hoverable
+            className="rounded-2xl shadow-lg transition-all duration-300"
+            actions={[
+              <Button type="primary" onClick={() => navigate("/admin/doctors")}>
+                View
+              </Button>,
+            ]}
+          >
+            <FaUserMd className="text-purple-500 text-5xl mb-4" />
+            <Text type="secondary">Manage registered doctors</Text>
+          </Card>
+        </Col>
+  
+        <Col xl={8} md={12} sm={24}>
+          <Card
+            title="All Certificate Requests"
+            bordered={false}
+            hoverable
+            className="rounded-2xl shadow-lg transition-all duration-300"
+            actions={[
+              <Button type="primary" onClick={() => navigate("/userhub")}>
+                Review
+              </Button>,
+            ]}
+          >
+            <FaRegFileAlt className="text-red-500 text-5xl mb-4" />
+            <Text type="secondary">View all requested certificates</Text>
+          </Card>
+        </Col>
+  
+        <Col xl={8} md={12} sm={24}>
+          <Card
+            title="All Users"
+            bordered={false}
+            hoverable
+            className="rounded-2xl shadow-lg transition-all duration-300"
+            actions={[
+              <Button type="primary" onClick={() => navigate("/admin/users")}>
+                Manage
+              </Button>,
+            ]}
+          >
+            <FaClipboardList className="text-green-500 text-5xl mb-4" />
+            <Text type="secondary">Manage user accounts</Text>
+          </Card>
+        </Col>
+  
+        <Col xl={8} md={12} sm={24}>
+          <Card
+            title="Change User Status"
+            bordered={false}
+            hoverable
+            className="rounded-2xl shadow-lg transition-all duration-300"
+            actions={[
+              <Button type="primary" onClick={() => navigate("/admin/changestatus")}>
+                Change
+              </Button>,
+            ]}
+          >
+            <FaNotesMedical className="text-indigo-500 text-5xl mb-4" />
+            <Text type="secondary">Promote or demote users/roles</Text>
+          </Card>
+        </Col>
+  
+        <Col xl={8} md={12} sm={24}>
+          <Card
+            title="Fetch User Certificates"
+            bordered={false}
+            hoverable
+            className="rounded-2xl shadow-lg transition-all duration-300"
+            actions={[
+              <Button type="primary" onClick={() => navigate("/fetchcertificates")}>
+                Fetch
+              </Button>,
+            ]}
+          >
+            <FaClipboardList className="text-orange-500 text-5xl mb-4" />
+            <Text type="secondary">Access specific user certificate data</Text>
+          </Card>
+        </Col>
+      </Row>
+    </div>
+  );
+  
+
   const renderDoctorDashboard = () => (
-    <Row gutter={[24, 24]}>
-      <Col span={12}>
+    <div className="bg-white p-6 rounded-xl shadow-md">
+      <Title level={4} className="mb-6 text-center text-gray-700">
+        Doctor Controls & Management Panel
+      </Title>
+      <Row gutter={[24, 24]}>
+      <Col xl={12} md={12} sm={24}>
         <Card
           title="Review Certificates"
           bordered={false}
-          className="shadow-lg"
+          hoverable
+          className="rounded-2xl shadow-lg transition-all duration-300"
           actions={[
             <Button type="primary" onClick={() => navigate("/usersforcertificate")}>
               Review
@@ -72,7 +189,8 @@ const HomePage = () => {
         <Card
           title="Manage Appointments"
           bordered={false}
-          className="shadow-lg"
+          hoverable
+          className="rounded-2xl shadow-lg transition-all duration-300"
           actions={[
             <Button type="primary" onClick={() => navigate("/doctor-appointments")}>
               Manage
@@ -84,15 +202,21 @@ const HomePage = () => {
         </Card>
       </Col>
     </Row>
+    </div>
   );
 
   const renderUserDashboard = () => (
-    <Row gutter={[24, 24]}>
-      <Col span={8}>
+    <div className="bg-white p-6 rounded-xl shadow-md">
+     <Title level={4} className="mb-6 text-center text-gray-700">
+        Hello Welcome to MediDocs
+      </Title>
+      <Row gutter={[24, 24]}>
+      <Col xl={8} md={12} sm={24}>
         <Card
           title="Request Certificate"
           bordered={false}
-          className="shadow-lg"
+          hoverable
+            className="rounded-2xl shadow-lg transition-all duration-300"
           actions={[
             <Button type="primary" onClick={() => navigate("/medicalcert")}>
               Request
@@ -107,7 +231,8 @@ const HomePage = () => {
         <Card
           title="View Certificate Status"
           bordered={false}
-          className="shadow-lg"
+          hoverable
+            className="rounded-2xl shadow-lg transition-all duration-300"
           actions={[
             <Button type="primary" onClick={() => navigate("/certificatestatus")}>
               View
@@ -122,7 +247,8 @@ const HomePage = () => {
         <Card
           title="Book Appointment"
           bordered={false}
-          className="shadow-lg"
+          hoverable
+            className="rounded-2xl shadow-lg transition-all duration-300"
           actions={[
             <Button type="primary" onClick={() => navigate("/doctorhub")}>
               Book
@@ -134,19 +260,30 @@ const HomePage = () => {
         </Card>
       </Col>
     </Row>
+    </div>
   );
 
   return (
     <Layout>
       <div className="max-w-6xl mx-auto px-6 py-6">
         <div className="mb-6">
-          <Title level={3}>
-            Hello, {user?.isDoctor ? `Dr. ${user?.name}` : user?.name || "User"}!
+           <Title level={3}>
+            Hello,{" "}
+            {user?.isAdmin
+              ? `Sir ${user?.name}`
+              : user?.isDoctor
+              ? `Dr. ${user?.name}`
+              : user?.name || "User"}
+            !
           </Title>
           <Text type="secondary">Welcome to your dashboard</Text>
         </div>
 
-        {user?.isDoctor ? renderDoctorDashboard() : renderUserDashboard()}
+        {user?.isAdmin
+          ? renderAdminDashboard()
+          : user?.isDoctor
+          ? renderDoctorDashboard()
+          : renderUserDashboard()}
       </div>
     </Layout>
   );
