@@ -185,7 +185,7 @@ const BookingPage = () => {
 
                 <button
                   onClick={openPaymentModal}
-                  className="w-full bg-blue-600 hover:bg-blue-700 transition-all text-white font-semibold py-2 px-4 rounded-md shadow"
+                  className="w-full bg-cyan-600 hover:bg-cyan-700 transition-all text-white font-semibold py-2 px-4 rounded-md shadow"
                 >
                   Confirm Booking
                 </button>
