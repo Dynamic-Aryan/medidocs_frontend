@@ -2,8 +2,9 @@ import React, { useEffect, useState } from "react";
 import Layout from "../components/Layout";
 import axios from "axios";
 import { useParams } from "react-router-dom";
-import { DatePicker, TimePicker, message } from "antd";
+import { DatePicker, TimePicker, message, Modal, Input, QRCode } from "antd";
 import moment from "moment";
+
 import { useDispatch, useSelector } from "react-redux";
 import { showLoading, hideLoading } from "../redux/features/alertSlice";
 import API_ENDPOINTS from "../api/endpoints";
@@ -15,6 +16,8 @@ const BookingPage = () => {
   const [date, setDate] = useState(null);
   const [time, setTime] = useState(null);
   const [isAvailable, setIsAvailable] = useState(false);
+  const [upiInput, setUpiInput] = useState("");
+  const [isModalVisible, setIsModalVisible] = useState(false);
   const dispatch = useDispatch();
 
   const getDoctorData = async () => {
@@ -61,7 +64,9 @@ const BookingPage = () => {
       );
       dispatch(hideLoading());
       if (res.data.success) {
-        message.success(res.data.message);
+        message.success("Appointment booked successfully!");
+        setIsModalVisible(false);
+        setUpiInput("");
       } else {
         message.error(res.data.message);
       }
@@ -102,6 +107,27 @@ const BookingPage = () => {
     }
   };
 
+  const validateUPI = (upi) => {
+    return /^[0-9]{10}@(ybl|ibl|axl|okaxis|okpaytm)$/.test(upi);
+  };
+
+  const openPaymentModal = () => {
+    if (!date || !time) {
+      return message.error("Please select date & time before payment.");
+    }
+    // if (!isAvailable) {
+    //   return message.warning("Check availability before confirming.");
+    // }
+    setIsModalVisible(true);
+  };
+
+  const confirmDummyPayment = () => {
+    if (!validateUPI(upiInput)) {
+      return message.error("Invalid UPI ID. Use format like 9876543210@okaxis");
+    }
+    handleBooking(); // trigger appointment booking
+  };
+
   useEffect(() => {
     getDoctorData();
   }, []);
@@ -120,13 +146,14 @@ const BookingPage = () => {
                 <h3 className="text-2xl font-semibold text-teal-800">
                   Dr. {doctors.firstName} {doctors.lastName}
                 </h3>
-                <p className="text-gray-600">Fees: ${doctors.feesPerConsultation}</p>
-                {/* <p className="text-gray-600">Timings: {doctors.timings}</p> */}
+                <p className="text-gray-600">Fees: ₹200</p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
                 <div>
-                  <label className="block text-gray-700 mb-1 font-medium">Select Date:</label>
+                  <label className="block text-gray-700 mb-1 font-medium">
+                    Select Date:
+                  </label>
                   <DatePicker
                     className="w-full rounded-md border border-gray-300 p-2"
                     format="DD-MM-YYYY"
@@ -137,18 +164,16 @@ const BookingPage = () => {
                 </div>
 
                 <div>
-                  <label className="block text-gray-700 mb-1 font-medium">Select Time:</label>
+                  <label className="block text-gray-700 mb-1 font-medium">
+                    Select Time:
+                  </label>
                   <TimePicker
                     className="w-full rounded-md border border-gray-300 p-2"
                     format="HH:mm"
-                    onChange={(value) =>
-                      setTime(moment(value).format("HH:mm"))
-                    }
+                    onChange={(value) => setTime(moment(value).format("HH:mm"))}
                   />
                 </div>
               </div>
-
-           
 
               <div className="mt-6 flex flex-col md:flex-row gap-4">
                 <button
@@ -159,7 +184,7 @@ const BookingPage = () => {
                 </button>
 
                 <button
-                  onClick={handleBooking}
+                  onClick={openPaymentModal}
                   className="w-full bg-blue-600 hover:bg-blue-700 transition-all text-white font-semibold py-2 px-4 rounded-md shadow"
                 >
                   Confirm Booking
@@ -169,6 +194,41 @@ const BookingPage = () => {
           )}
         </div>
       </div>
+
+      <Modal
+        title="🔐 Dummy Payment Gateway"
+        open={isModalVisible}
+        onCancel={() => setIsModalVisible(false)}
+        footer={null}
+      >
+        <div className="flex justify-center my-3">
+          <QRCode value="9876543210@okaxis" size={160} />
+        </div>
+
+        <p className="text-center text-gray-600 font-medium text-lg mb-1">
+          💳 Amount to Pay:{" "}
+          <span className="text-black font-semibold">
+            ₹{doctors?.feesPerConsultation || 200}
+          </span>
+        </p>
+        <p className="text-center text-gray-600 mb-3 text-sm">
+          Scan the QR or enter the UPI ID to simulate payment
+        </p>
+
+        <Input
+          placeholder="Enter UPI ID (e.g., 9876543210@okaxis)"
+          value={upiInput}
+          onChange={(e) => setUpiInput(e.target.value)}
+          className="mt-2"
+        />
+
+        <button
+          onClick={confirmDummyPayment}
+          className="w-full mt-4 bg-green-600 hover:bg-green-700 text-white py-2 rounded-md font-semibold transition-all"
+        >
+          ✅ Pay & Book Appointment
+        </button>
+      </Modal>
     </Layout>
   );
 };
