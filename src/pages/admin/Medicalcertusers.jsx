@@ -97,6 +97,40 @@ const Medicalcertusers = () => {
       render: symptoms => symptoms?.join(', '),
     },
     {
+      title:"Identity",
+      dataIndex:"identityProofUrl",
+      render: (url) =>
+        url ? (
+          <a
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-600 underline hover:text-blue-800"
+          >
+            View Identity
+          </a>
+        ) : (
+          <span className="text-gray-400 italic">N/A</span>
+        ),
+    },
+    {
+        title:"Report File",
+      dataIndex:"reportFileUrl",
+      render: (url) =>
+        url ? (
+          <a
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-600 underline hover:text-blue-800"
+          >
+            View Report File
+          </a>
+        ) : (
+          <span className="text-gray-400 italic">N/A</span>
+        ),
+    },
+    {
       title: "Status",
       dataIndex: "status",
       className: "text-gray-600",
@@ -187,6 +221,33 @@ const Medicalcertusers = () => {
             <Descriptions.Item label="Certificate Purpose">{selectedUser.certificatePurpose}</Descriptions.Item>
             <Descriptions.Item label="Status">{selectedUser.status}</Descriptions.Item>
             <Descriptions.Item label="Digital Signature">{selectedUser.digitalSignature || 'N/A'}</Descriptions.Item>
+            
+              <Descriptions.Item label="Identity Proof">
+                          {selectedUser.identityProofUrl ? (
+                            <a
+                              href={selectedUser.identityProofUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              View Identity
+                            </a>
+                          ) : (
+                            "N/A"
+                          )}
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Report File">
+                          {selectedUser.reportFileUrl ? (
+                            <a
+                              href={selectedUser.reportFileUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              View Report
+                            </a>
+                          ) : (
+                            "N/A"
+                          )}
+                        </Descriptions.Item>
             <Descriptions.Item label="Requested At">
               {new Date(selectedUser.requestedAt).toLocaleString()}
             </Descriptions.Item>

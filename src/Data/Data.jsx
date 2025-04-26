@@ -1,58 +1,50 @@
+import { FiHome, FiCalendar, FiUser, FiUsers, FiFileText, FiClipboard, FiEdit } from "react-icons/fi";
+import { MdOutlineMedicalServices } from "react-icons/md"; 
 
-//user menu
-
-
-
-//admin menu
 export const ADMIN_MENU = [
   {
     name: "Home",
     path: "/",
-   
+    icon: <FiHome />
   },
   {
     name: "All Appointments",
     path: "/admin/allappointments",
-    
+    icon: <FiCalendar />
   },
   {
-    name: "Doctor's Hub",
+    name: "All Doctors",
     path: "/doctorhub",
-    
+    icon: <FiUser />
   },
   {
     name: "Certificate Requests",
     path: "/userhub",
-    
+    icon: <FiClipboard />
   },
   {
-    name: "List of Doctors",
+    name: "List Of Doctors",
     path: "/admin/doctors",
-    
+    icon: <FiUsers />
   },
- 
   {
-    name: "List of Users",
+    name: "List Of Users",
     path: "/admin/users",
-    
+    icon: <FiUsers />
   },
   {
-    name:"Change User Status",
-    path:"/admin/changestatus",
+    name: "Change User Status",
+    path: "/admin/changestatus",
+    icon: <FiEdit />
   },
   {
-    name: "List of Users applied for medical certificate",
+    name: "Users Applied For Medical Certificate",
     path: "/usersforcertificate",
-    
+    icon: <MdOutlineMedicalServices />
   },
-
   {
-    name: "Fetch Users Certificates",
+    name: "Issued Certificates",
     path: "/fetchcertificates",
-    
+    icon: <FiFileText />
   },
-  
-
- 
 ];
-

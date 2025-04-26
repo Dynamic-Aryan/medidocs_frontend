@@ -2,20 +2,16 @@ import React, { useEffect, useState } from "react";
 import Layout from "../components/Layout";
 import axios from "axios";
 import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
 import API_ENDPOINTS from "../api/endpoints";
 import MediDocs from "../assets/aryanmd.webp";
 
 import {
   LoadingOutlined,
   CheckCircleOutlined,
-  DownloadOutlined,
   CreditCardOutlined,
 } from "@ant-design/icons";
 import {
-  Modal,
-  Input,
-  message,
+ 
   Card,
   Typography,
   Tag,
@@ -23,7 +19,7 @@ import {
   Divider,
   Empty,
   Spin,
-  QRCode,
+  message,
 } from "antd";
 
 const { Title, Text, Paragraph } = Typography;
@@ -31,10 +27,39 @@ const { Title, Text, Paragraph } = Typography;
 const Usercertificate = () => {
   const [certificates, setCertificates] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [upiModalVisible, setUpiModalVisible] = useState(false);
-  const [upiInput, setUpiInput] = useState("");
   const [selectedCertificate, setSelectedCertificate] = useState(null);
-  const [showPdfStyleModal, setShowPdfStyleModal] = useState(false);
+    const [approvedDoctors, setApprovedDoctors] = useState([]);
+
+
+  const fetchApprovedDoctors = async () => {
+    try {
+      const res = await axios.get(API_ENDPOINTS.getApprovedDoctors, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+      if (res.data.success) {
+        setApprovedDoctors(res.data.data);
+      } else {
+        message.error("Failed to load approved doctors");
+      }
+    } catch (error) {
+      console.error("Error fetching doctors:", error);
+      message.error("Error fetching doctors");
+    }
+  };
+
+  useEffect(() => {
+    fetchApprovedDoctors();
+  }, []);
+
+
+  useEffect(() => {
+    // Fetch the certificates
+    fetchCertificates();
+  }, []);
+
+
 
   const fetchCertificates = async () => {
     try {
@@ -53,330 +78,190 @@ const Usercertificate = () => {
     }
   };
 
-  useEffect(() => {
-    fetchCertificates();
-  }, []);
-
-  const isValidUpi = (upi) => {
-    return /^[0-9]{10}@(ybl|ibl|axl|okaxis|okpaytm)$/.test(upi);
-  };
-
-  const handlePayAndDownload = () => {
-    if (!isValidUpi(upiInput)) {
-      message.error("❌ Invalid UPI ID. Use format like 9876543210@okaxis");
-      return;
-    }
-    message.success("✅ Payment successful!");
-    setUpiModalVisible(false);
-    setShowPdfStyleModal(true);
-    setUpiInput("");
-  };
-
   const triggerDownload = (certificate) => {
     setSelectedCertificate(certificate);
-    setUpiModalVisible(true);
+    generateMedidocsCertificate(certificate);  
   };
 
-  const handlePdfDownload = (style) => {
-    setShowPdfStyleModal(false);
-    switch (style) {
-      case 1:
-        handleDownloadPDFStyle1(selectedCertificate);
-        break;
-      case 2:
-        handleDownloadPDFStyle2(selectedCertificate);
-        break;
-      case 3:
-        handleDownloadPDFStyle3(selectedCertificate);
-        break;
-      default:
-        break;
+  
+
+  const getBase64FromUrl = async (url) => {
+    const response = await fetch(url);
+    const blob = await response.blob();
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  };
+
+  const generateMedidocsCertificate = async (certificate) => {
+    try {
+      const doc = new jsPDF("p", "mm", "a4");
+      const pageWidth = doc.internal.pageSize.getWidth();
+  
+      const primaryColor = [33, 103, 168];
+      const darkColor = [30, 30, 30];
+      const lightBlue = [173, 216, 230];
+      const lightCyan = [224, 255, 255];
+  
+      const headerHeight = 40;
+      const footerHeight = 30;
+      const footerY = 265;
+  
+      // HEADER
+      doc.setFillColor(...primaryColor);
+      doc.rect(0, 0, pageWidth, headerHeight, "F");
+  
+      if (typeof MediDocs !== "undefined") {
+        doc.addImage(MediDocs, "WEBP", 10, 8, 20, 20);
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(16);
+        doc.setTextColor(255, 255, 255);
+        doc.text("Medidocs Organization", 35, 20);
+      }
+  
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(12);
+  
+      const doctor = approvedDoctors.find(
+        (doc) => doc._id === certificate.doctorId
+      );
+  
+      // prepare doctor name
+      const doctorName = doctor
+        ? `Dr. ${doctor.firstName} ${doctor.lastName}`
+        : `Dr. ${certificate.signature || "Unknown"}`;
+  
+      const doctorSpecialization = doctor
+        ? doctor.specialization
+        : "General Medicine";
+  
+      // Add doctor info at top right
+      doc.text(doctorName, pageWidth - 10, 20, { align: "right" });
+      doc.text(doctorSpecialization, pageWidth - 10, 26, { align: "right" });
+  
+      // Draw light cyan background
+      const contentAreaHeight = footerY - headerHeight;
+      doc.setFillColor(...lightCyan);
+      doc.rect(0, headerHeight, pageWidth, contentAreaHeight, "F");
+  
+      // SICK LEAVE TITLE
+      const titleY = headerHeight + 10;
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(14);
+      doc.setTextColor(...darkColor);
+      doc.text("SICK LEAVE CERTIFICATE", pageWidth / 2, titleY, { align: "center" });
+  
+      // Blue line under title
+      doc.setDrawColor(...lightBlue);
+      doc.line(20, titleY + 2, pageWidth - 20, titleY + 2);
+  
+      // Issue Date and Doc No
+      doc.setFontSize(10);
+      doc.setFont("helvetica", "bold");
+      doc.setTextColor(...darkColor);
+      const issueDate = new Date(certificate.createdAt).toLocaleDateString();
+      doc.text(`Issue Date: ${issueDate}`, 20, headerHeight + 25);
+      doc.text(`Document No.: ${certificate.userId}`, pageWidth - 20, headerHeight + 25, { align: "right" });
+  
+      // Employer Info
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(12);
+      doc.text("To,", 20, headerHeight + 37);
+      doc.text(`${certificate.employer} Pvt Ltd`, 20, headerHeight + 44);
+  
+      // Paragraph
+      const paragraphY = headerHeight + 55;
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(11);
+      doc.setTextColor(...darkColor);
+  
+      const paragraph = `This is to certify that I, ${doctorName}, after a detailed online consultation, have examined Mr. ${certificate.name}, a ${certificate.age}-year-old ${certificate.gender}, residing at ${certificate.address}.
+  
+  Upon assessment, the patient reported symptoms of ${certificate.symptoms.join(
+        ", "
+      )}, leading to a clinical diagnosis of ${certificate.reason}. The illness has persisted for approximately ${certificate.durationOfIllness} day(s) and is currently assessed as ${certificate.severity} in nature. The patient’s past medical history, surgical history, family history, and environmental factors were reviewed and found to be unremarkable. No emergency treatments have been undertaken to date.
+  
+  Current medications and clinical findings were evaluated, and based on the symptoms and severity, it is advised that Mr. ${certificate.name} be granted a rest period of ${certificate.duration} day(s) to facilitate complete recovery.
+  
+  This certificate is issued upon the patient's request to support leave of absence from duties at ${certificate.employer} for ${certificate.certificatePurpose} purposes. It is emphasized that this certificate is based solely on the symptoms and history provided during the online consultation.`;
+  
+      const lines = doc.splitTextToSize(paragraph, 170);
+      doc.text(lines, 20, paragraphY);
+  
+      // Links
+      let linkY = paragraphY + lines.length * 7 - 18;
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(11);
+      doc.setTextColor(0, 102, 204);
+  
+      doc.textWithLink("View Identity Proof", 20, linkY, {
+        url: certificate.identityProofUrl || "#",
+      });
+      doc.textWithLink("View Medical Report", 60, linkY, {
+        url: certificate.reportFileUrl || "#",
+      });
+  
+      // Signature
+      let signY = linkY + 20;
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(11);
+      doc.setTextColor(...darkColor);
+      doc.text("Patient's Name :", 20, signY);
+  
+      doc.setFont("helvetica", "normal");
+      doc.text(`${certificate.name}`, 50, signY);
+  
+      if (certificate.signatureImageUrl) {
+        try {
+          const signatureBase64 = await getBase64FromUrl(certificate.signatureImageUrl);
+          doc.addImage(signatureBase64, "PNG", 130, signY - 5, 50, 20);
+        } catch (error) {
+          console.error("Error loading signature image", error);
+        }
+      }
+  
+      doc.setFont("helvetica", "bold");
+      doc.text(doctorName, 135, signY + 20);
+      
+      doc.setFont("helvetica", "italic");
+      doc.setFontSize(9);
+      doc.text(`Digitally Signed on ${new Date().toLocaleString()}`, 135, signY + 26);
+      
+
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(11);
+      doc.setTextColor(...darkColor);
+      doc.text(`Dr. ${certificate.signature}`, pageWidth - 20, footerY - 15,{
+        align:"right",
+      });
+      // FOOTER
+      doc.setFillColor(...primaryColor);
+      doc.rect(0, footerY, pageWidth, footerHeight, "F");
+  
+      doc.setFont("helvetica", "italic");
+      doc.setFontSize(9);
+      doc.setTextColor(255, 255, 255);
+  
+      const footerText =
+        "This certificate is digitally issued by Medidocs — your trusted health partner. " +
+        "This medical certificate is not valid without the document number, doctor's signature, identity proof URL, and report URL. " +
+        "The details mentioned in this medical document are as per the symptoms shared by the patient during the online consultation. " +
+        "Neither the doctor nor Medidocs Organization holds responsibility if false information was provided.";
+  
+      const footerLines = doc.splitTextToSize(footerText, pageWidth - 40);
+      doc.text(footerLines, 20, footerY + 7);
+  
+      // Save PDF
+      doc.save(`Medical_Certificate_${certificate.name}.pdf`);
+    } catch (error) {
+      console.error("Error generating certificate:", error);
     }
   };
+  
 
-  const handleDownloadPDFStyle1 = (certificate) => {
-    generatePDFStyle1(certificate, "Certificate 1");
-  };
-
-  const handleDownloadPDFStyle2 = (certificate) => {
-    generatePDFStyle2(certificate, "Certificate 2");
-  };
-
-  const handleDownloadPDFStyle3 = (certificate) => {
-    generatePDFStyle3(certificate, "Certificate 3");
-  };
-
-  const generatePDFStyle1 = (certificate, title) => {
-    const doc = new jsPDF("p", "mm", "a4");
-
-    const primary = [34, 58, 94];
-    const accent = [218, 165, 32];
-    const lightGray = [240, 240, 240];
-    const textDark = [40, 40, 40];
-
-    doc.setFillColor(255, 255, 255);
-    doc.rect(0, 0, 210, 297, "F");
-
-    doc.setDrawColor(...accent);
-    doc.setLineWidth(1.5);
-    doc.rect(10, 10, 190, 277);
-
-    doc.setFillColor(...primary);
-    doc.rect(10, 10, 190, 30, "F");
-
-    doc.setTextColor(255, 255, 255);
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(22);
-
-    doc.text(" Medical Certificate", 105, 25, {
-      align: "center",
-    });
-    doc.setFontSize(10);
-    doc.text("Issued by Medidocs Health Records", 105, 33, { align: "center" });
-
-    doc.setDrawColor(...accent);
-    doc.setLineWidth(0.3);
-    doc.line(30, 45, 180, 45);
-
-    doc.setDrawColor(...accent);
-    doc.setLineWidth(1);
-    doc.addImage(MediDocs, "WEBP", 15, 15, 20, 20);
-
-    autoTable(doc, {
-      startY: 50,
-      theme: "plain",
-      margin: { left: 20, right: 20 },
-      styles: { fontSize: 11, textColor: textDark[0], cellPadding: 2 },
-      headStyles: { fontStyle: "bold", textColor: primary },
-      alternateRowStyles: { fillColor: lightGray },
-      head: [["Field", "Details"]],
-      body: [
-        ["Name", certificate.name],
-        ["Email", certificate.email],
-        ["Age", certificate.age],
-        ["Gender", certificate.gender],
-        ["Address", certificate.address],
-        ["Employer", certificate.employer],
-        ["Duration", `${certificate.duration} days`],
-        ["Reason", certificate.reason],
-        ["Symptoms", certificate.symptoms?.join(", ") || "N/A"],
-        ["Duration of Illness", certificate.durationOfIllness],
-        ["Medical History", certificate.medicalHistory],
-        ["Medications", certificate.medications],
-        ["Emergency Treatment", certificate.emergencyTreatment],
-        ["Previous Surgeries", certificate.previousSurgeries],
-        ["Family History", certificate.familyHistory],
-        ["Environmental Cause", certificate.environmentalCause],
-        ["Severity", certificate.severity],
-        ["Consultation Status", certificate.consultationStatus],
-        ["Certificate Purpose", certificate.certificatePurpose],
-        ["Status", certificate.status],
-      ],
-    });
-
-    const finalY = doc.lastAutoTable.finalY;
-
-    doc.setFontSize(13);
-    doc.setFont("helvetica", "bold");
-    doc.setTextColor(...primary);
-    doc.text("Authorized Signatures", 20, finalY + 15);
-
-    doc.setFillColor(248, 248, 248);
-    doc.rect(18, finalY + 18, 174, 30, "F");
-
-    doc.setFontSize(11.5);
-    doc.setTextColor(...textDark);
-    doc.setFont("helvetica", "bold");
-    doc.text("Typed Signature:", 20, finalY + 25);
-    doc.setFont("helvetica", "normal");
-    doc.text(`${certificate.signature || "N/A"}`, 65, finalY + 25);
-
-    doc.setFont("helvetica", "bold");
-    doc.text("Digital Signature:", 20, finalY + 32);
-    doc.setFont("helvetica", "normal");
-    doc.text(`${certificate.digitalSignature || "N/A"}`, 65, finalY + 32);
-
-    doc.setFont("helvetica", "bold");
-    doc.text("Issued Date:", 20, finalY + 39);
-    doc.setFont("helvetica", "normal");
-    doc.text(`${new Date().toLocaleDateString()}`, 65, finalY + 39);
-
-    doc.setDrawColor(...accent);
-    doc.setLineWidth(0.2);
-    doc.line(20, 285, 190, 285);
-
-    doc.setFontSize(9);
-    doc.setTextColor(100, 100, 100);
-    doc.setFont("helvetica", "italic");
-    doc.text(
-      "This document is digitally generated by Medidocs — Your Trusted Medical Partner",
-      105,
-      290,
-      { align: "center" }
-    );
-
-    doc.save(`Medical_Certificate_${certificate.name}_${title}.pdf`);
-  };
-
-  const generatePDFStyle2 = (certificate, title) => {
-    const doc = new jsPDF("p", "mm", "a4");
-
-    const primary = [0, 102, 204]; // Soft blue
-    const accent = [192, 192, 192]; // Gray
-    const textDark = [33, 33, 33];
-
-    doc.setFillColor(255, 255, 255);
-    doc.rect(0, 0, 210, 297, "F");
-
-    doc.setFillColor(...accent);
-    doc.rect(15, 15, 180, 20, "F");
-
-    doc.setTextColor(0, 0, 0);
-    doc.setFontSize(18);
-    doc.setFont("times", "bold");
-    doc.text("Medical Record", 105, 28, { align: "center" });
-
-    doc.setDrawColor(...primary);
-    doc.setLineWidth(0.8);
-    doc.line(20, 40, 190, 40);
-
-    doc.addImage(MediDocs, "WEBP", 15, 15, 20, 20);
-
-    autoTable(doc, {
-      startY: 45,
-      theme: "grid",
-      headStyles: {
-        fillColor: primary,
-        textColor: 255,
-        fontStyle: "bold",
-      },
-      styles: {
-        font: "times",
-        fontSize: 11,
-        textColor: textDark[0],
-      },
-      head: [["Field", "Details"]],
-      body: [
-        ["Name", certificate.name],
-        ["Email", certificate.email],
-        ["Age", certificate.age],
-        ["Gender", certificate.gender],
-        ["Address", certificate.address],
-        ["Employer", certificate.employer],
-        ["Duration", `${certificate.duration} days`],
-        ["Reason", certificate.reason],
-        ["Symptoms", certificate.symptoms?.join(", ") || "N/A"],
-        ["Duration of Illness", certificate.durationOfIllness],
-        ["Medical History", certificate.medicalHistory],
-        ["Medications", certificate.medications],
-        ["Emergency Treatment", certificate.emergencyTreatment],
-        ["Previous Surgeries", certificate.previousSurgeries],
-        ["Family History", certificate.familyHistory],
-        ["Environmental Cause", certificate.environmentalCause],
-        ["Severity", certificate.severity],
-        ["Consultation Status", certificate.consultationStatus],
-        ["Certificate Purpose", certificate.certificatePurpose],
-        ["Status", certificate.status],
-      ],
-    });
-
-    const y = doc.lastAutoTable.finalY + 10;
-
-    doc.setFont("times", "bold");
-    doc.setFontSize(12);
-    doc.text("Authorized Signature", 20, y);
-
-    doc.setFont("times", "normal");
-    doc.text(`Signed by: ${certificate.signature || "N/A"}`, 20, y + 7);
-    doc.text(
-      `Digital Signature: ${certificate.digitalSignature || "N/A"}`,
-      20,
-      y + 14
-    );
-    doc.text(`Issued On: ${new Date().toLocaleDateString()}`, 20, y + 21);
-
-    doc.save(`Medical_Certificate_${certificate.name}_${title}.pdf`);
-  };
-
-  const generatePDFStyle3 = (certificate, title) => {
-    const doc = new jsPDF("p", "mm", "a4");
-    const accent = [31, 195, 62];
-
-    doc.setFillColor(245, 245, 245);
-    doc.rect(0, 0, 210, 297, "F");
-
-    doc.setTextColor(50, 50, 50);
-    doc.setFont("courier", "bold");
-    doc.setFontSize(20);
-    doc.text(" Medical Certificate", 105, 25, {
-      align: "center",
-    });
-
-    doc.setFontSize(10);
-    doc.setFont("courier", "italic");
-    doc.text("Verified by Medidocs", 105, 32, { align: "center" });
-
-    doc.addImage(MediDocs, "WEBP", 15, 15, 20, 20);
-
-    autoTable(doc, {
-      startY: 40,
-      theme: "striped",
-      styles: {
-        font: "courier",
-        fontSize: 10,
-        cellPadding: 1.5,
-        textColor: 20,
-      },
-      headStyles: {
-        fillColor: [80, 80, 80],
-        textColor: 255,
-        fontStyle: "bold",
-      },
-      alternateRowStyles: { fillColor: [235, 235, 235] },
-      head: [["Field", "Details"]],
-      body: [
-        ["Name", certificate.name],
-        ["Email", certificate.email],
-        ["Age", certificate.age],
-        ["Gender", certificate.gender],
-        ["Address", certificate.address],
-        ["Employer", certificate.employer],
-        ["Duration", `${certificate.duration} days`],
-        ["Reason", certificate.reason],
-        ["Symptoms", certificate.symptoms?.join(", ") || "N/A"],
-        ["Duration of Illness", certificate.durationOfIllness],
-        ["Medical History", certificate.medicalHistory],
-        ["Medications", certificate.medications],
-        ["Emergency Treatment", certificate.emergencyTreatment],
-        ["Previous Surgeries", certificate.previousSurgeries],
-        ["Family History", certificate.familyHistory],
-        ["Environmental Cause", certificate.environmentalCause],
-        ["Severity", certificate.severity],
-        ["Consultation Status", certificate.consultationStatus],
-        ["Certificate Purpose", certificate.certificatePurpose],
-        ["Status", certificate.status],
-      ],
-    });
-
-    const y = doc.lastAutoTable.finalY + 10;
-
-    doc.setFont("courier", "bold");
-    doc.text("Authorized Signature", 20, y);
-
-    doc.setFont("courier", "normal");
-    doc.text(`Typed: ${certificate.signature || "N/A"}`, 20, y + 7);
-    doc.text(`Digital: ${certificate.digitalSignature || "N/A"}`, 20, y + 14);
-    doc.text(`Issued: ${new Date().toLocaleDateString()}`, 20, y + 21);
-
-    doc.setFont("courier", "italic");
-    doc.setFontSize(8);
-    doc.setTextColor(120, 120, 120);
-    doc.text("Generated via Medidocs - Trusted Health Platform", 105, 290, {
-      align: "center",
-    });
-
-    doc.save(`Medical_Certificate_${certificate.name}_${title}.pdf`);
-  };
 
   return (
     <Layout>
@@ -442,7 +327,7 @@ const Usercertificate = () => {
                     onClick={() => triggerDownload(certificate)}
                     className="bg-green-600 hover:bg-green-700"
                   >
-                    Pay & Download Certificate
+                   Download Certificate
                   </Button>
                 </>
               )}
@@ -457,67 +342,6 @@ const Usercertificate = () => {
         )}
       </div>
 
-      {/* UPI Modal */}
-      <Modal
-        title="💳 UPI Payment"
-        open={upiModalVisible}
-        onCancel={() => setUpiModalVisible(false)}
-        onOk={handlePayAndDownload}
-        okText="Pay & Download"
-        okButtonProps={{ icon: <DownloadOutlined /> }}
-      >
-        <div className="flex justify-center my-3">
-          <QRCode value="9876543210@okaxis" size={160} />
-        </div>
-
-        <p className="text-center text-gray-600 font-medium text-lg mb-1">
-          💳 Amount to Pay:{" "}
-          <span className="text-black font-semibold">₹200</span>
-        </p>
-
-        <p className="text-center text-gray-600 mb-2 text-sm">
-          Scan the QR or enter the UPI ID manually to simulate payment.
-        </p>
-
-        <Input
-          placeholder="Enter UPI ID (e.g., 9876543210@okaxis)"
-          value={upiInput}
-          onChange={(e) => setUpiInput(e.target.value)}
-          className="mt-2"
-        />
-      </Modal>
-
-      {/* PDF Style Selection Modal */}
-      <Modal
-        title="📄 Choose Certificate Style"
-        open={showPdfStyleModal}
-        onCancel={() => setShowPdfStyleModal(false)}
-        footer={null}
-      >
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
-          <Button
-            type="default"
-            onClick={() => handlePdfDownload(1)}
-            className="bg-white border-teal-600 text-teal-600 hover:bg-teal-50"
-          >
-            Certificate 1
-          </Button>
-          <Button
-            type="default"
-            onClick={() => handlePdfDownload(2)}
-            className="bg-white border-green-600 text-green-600 hover:bg-green-50"
-          >
-            Certificate 2
-          </Button>
-          <Button
-            type="default"
-            onClick={() => handlePdfDownload(3)}
-            className="bg-white border-purple-600 text-purple-600 hover:bg-purple-50"
-          >
-            Certificate 3
-          </Button>
-        </div>
-      </Modal>
     </Layout>
   );
 };

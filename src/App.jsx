@@ -25,6 +25,7 @@ import Usercertificateinfo from "./pages/user/Usercertificateinfo";
 import Fetchcertificates from "./pages/doctor/Fetchcertificates";
 import Allappointments from "./pages/admin/Allappointments";
 import Userstatus from "./pages/admin/Userstatus";
+import BookingSuccess from "./pages/BookingSuccess";
 
 function App() {
   const { loading } = useSelector((state) => state.alerts);
@@ -157,6 +158,10 @@ function App() {
                   <Appointments />
                 </ProtectedRoute>
               }
+            />
+            <Route
+             path="/booking-success" element={<BookingSuccess />}
+
             />
              <Route
               path="/fetchcertificates"

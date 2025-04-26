@@ -127,6 +127,41 @@ const Doctors = () => {
       dataIndex: "specialization",
     },
     {
+      title: "Valid Signature",
+      dataIndex: "signatureUrl",
+      render: (url) =>
+        url ? (
+          <a
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-600 underline hover:text-blue-800"
+          >
+            View Signature
+          </a>
+        ) : (
+          <span className="text-gray-400 italic">N/A</span>
+        ),
+    },
+    {
+      title: "Authorized Degree",
+      dataIndex: "degreeUrl",
+      render: (url) =>
+        url ? (
+          <a
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-green-600 underline hover:text-green-800"
+          >
+            View Degree
+          </a>
+        ) : (
+          <span className="text-gray-400 italic">N/A</span>
+        ),
+    },
+    
+    {
       title: "Status",
       dataIndex: "status",
       render: (text) => {
@@ -137,7 +172,11 @@ const Doctors = () => {
         return (
           <span
             className={`px-3 py-1 rounded-full text-white font-semibold inline-flex items-center gap-2 ${
-              isPending ? "bg-yellow-500" : isApproved ? "bg-green-500" : "bg-red-500"
+              isPending
+                ? "bg-yellow-500"
+                : isApproved
+                ? "bg-green-500"
+                : "bg-red-500"
             }`}
           >
             {isPending && <LoadingOutlined />}
@@ -242,19 +281,69 @@ const Doctors = () => {
             <Descriptions.Item label="Full Name">
               {selectedDoctor.firstName} {selectedDoctor.lastName}
             </Descriptions.Item>
-            <Descriptions.Item label="Email">{selectedDoctor.email}</Descriptions.Item>
-            <Descriptions.Item label="Phone">{selectedDoctor.phone}</Descriptions.Item>
-            <Descriptions.Item label="Address">{selectedDoctor.address}</Descriptions.Item>
-            <Descriptions.Item label="Website">{selectedDoctor.website || "N/A"}</Descriptions.Item>
-            <Descriptions.Item label="Specialization">{selectedDoctor.specialization}</Descriptions.Item>
-            <Descriptions.Item label="Experience">{selectedDoctor.experience} years</Descriptions.Item>
-            <Descriptions.Item label="Fees">{selectedDoctor.feesPerConsultation} ₹</Descriptions.Item>
-            <Descriptions.Item label="Timings">
-              {selectedDoctor.timings.join(" - ")}
+            <Descriptions.Item label="Email">
+              {selectedDoctor.email || "N/A"}
             </Descriptions.Item>
-            <Descriptions.Item label="Status">{selectedDoctor.status}</Descriptions.Item>
+            <Descriptions.Item label="Phone">
+              {selectedDoctor.phone || "N/A"}
+            </Descriptions.Item>
+            <Descriptions.Item label="Address">
+              {selectedDoctor.address || "N/A"}
+            </Descriptions.Item>
+            <Descriptions.Item label="Website">
+              {selectedDoctor.website || "N/A"}
+            </Descriptions.Item>
+            <Descriptions.Item label="Specialization">
+              {selectedDoctor.specialization || "N/A"}
+            </Descriptions.Item>
+            <Descriptions.Item label="Experience">
+              {selectedDoctor.experience
+                ? `${selectedDoctor.experience} years`
+                : "N/A"}
+            </Descriptions.Item>
+            <Descriptions.Item label="Fees">
+              {selectedDoctor.feesPerConsultation
+                ? `${selectedDoctor.feesPerConsultation} ₹`
+                : "N/A"}
+            </Descriptions.Item>
+            <Descriptions.Item label="Timings">
+              {Array.isArray(selectedDoctor.timings)
+                ? selectedDoctor.timings.join(" - ")
+                : selectedDoctor.timings || "N/A"}
+            </Descriptions.Item>
+            <Descriptions.Item label="Signature">
+              {selectedDoctor.signatureUrl ? (
+                <a
+                  href={selectedDoctor.signatureUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  View Signature
+                </a>
+              ) : (
+                "N/A"
+              )}
+            </Descriptions.Item>
+            <Descriptions.Item label="Degree">
+              {selectedDoctor.degreeUrl ? (
+                <a
+                  href={selectedDoctor.degreeUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  View Degree
+                </a>
+              ) : (
+                "N/A"
+              )}
+            </Descriptions.Item>
+            <Descriptions.Item label="Status">
+              {selectedDoctor.status || "N/A"}
+            </Descriptions.Item>
             <Descriptions.Item label="Created At">
-              {new Date(selectedDoctor.createdAt).toLocaleString()}
+              {selectedDoctor.createdAt
+                ? new Date(selectedDoctor.createdAt).toLocaleString()
+                : "N/A"}
             </Descriptions.Item>
           </Descriptions>
         )}

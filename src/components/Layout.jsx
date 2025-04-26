@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import { ADMIN_MENU } from "../Data/Data";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { Badge, message } from "antd";
+import { FiLogOut, FiUserPlus, FiBell, FiHome, FiCalendar, FiUsers, FiUser, FiClipboard, FiFileText, FiDownloadCloud } from "react-icons/fi";
 import Medidocs from "../assets/medidocs.webp";
 import Logo from "../assets/aryanmd.webp";
 
@@ -10,87 +11,40 @@ const Layout = ({ children }) => {
   const { user } = useSelector((state) => state.user);
   const location = useLocation();
   const navigate = useNavigate();
+  const [collapsed, setCollapsed] = useState(false);
 
-  // Logout function
   const handleLogout = () => {
     localStorage.clear();
-    message.success("Logout Successfully");
+    message.success("Logged out successfully");
     navigate("/login");
   };
 
   const handleSignup = () => {
     localStorage.clear();
-    message.success("Registered Successfully");
+    message.success("Registered successfully");
     navigate("/register");
   };
 
-  // doctor menu
   const USER_MENU = [
-    {
-      name: "Home",
-      path: "/",
-    },
-    {
-      name: "Appointments",
-      path: "/appointments",
-    },
-    {
-      name: "Apply For Medical Certificate",
-      path: "/medicalcert",
-    },
-    {
-      name: "Doctor's Hub",
-      path: "/doctorhub",
-    },
-
-    {
-      name: "Apply Doctor",
-      path: "/apply-doctor",
-    },
-    {
-      name: "Certificate Status",
-      path: "/certificatestatus",
-    },
-
-    {
-      name: "Get Certificate",
-      path: "/certificates",
-    },
-    {
-      name: "Profile",
-      path: `/user/profile/${user?._id}`,
-    },
+    { name: "Home", path: "/" , icon: <FiHome /> },
+    { name: "Your Appointments", path: "/appointments" , icon: <FiCalendar />},
+    { name: "Medical Certificate Apply Here", path: "/medicalcert", icon: <FiDownloadCloud />  },
+    { name: "Find Doctors", path: "/doctorhub" , icon: <FiUsers />},
+    { name: "Become a Doctor", path: "/apply-doctor" , icon: <FiUser />},
+    { name: "Your Certificate Status", path: "/certificatestatus" , icon: <FiClipboard /> },
+    { name: "Get Your Certificate", path: "/certificates", icon: <FiFileText /> },
+    { name: "Profile", path: `/user/profile/${user?._id}`, icon: <FiUser /> },
   ];
 
   const DOCTOR_MENU = [
-    {
-      name: "Home",
-      path: "/",
-    },
-    {
-      name: "Appointments",
-      path: "/doctor-appointments",
-    },
-
-    {
-      name: "Certificate Requests",
-      path: "/userhub",
-    },
-
-    {
-      name: "List of Users applied for medical certificate",
-      path: "/usersforcertificate",
-    },
-    {
-      name: "Fetch Users Certificates",
-      path: "/fetchcertificates",
-    },
-    {
-      name: "Profile",
-      path: `/doctor/profile/${user?._id}`,
-    },
+    { name: "Home", path: "/", icon: <FiHome />  },
+    { name: "Appointments", path: "/doctor-appointments" , icon: <FiCalendar />},
+    { name: "User List", path: "/usersforcertificate" , icon: <FiUsers />},
+    { name: "Certificate Requests", path: "/userhub" , icon: <FiClipboard />},
+    { name: "Issued Certificates", path: "/fetchcertificates", icon: <FiFileText /> },
+    { name: "Profile", path: `/doctor/profile/${user?._id}` , icon: <FiUser />},
   ];
-  // Determine Sidebar Menu based on Role
+
   const SIDEBAR_MENU = user?.isAdmin
     ? ADMIN_MENU
     : user?.isDoctor
@@ -98,95 +52,93 @@ const Layout = ({ children }) => {
     : USER_MENU;
 
   return (
-    <div className="flex bg-gray-100">
+    <div className="flex h-screen font-[Poppins] bg-[#f1f5f8] overflow-hidden">
+      
       {/* Sidebar */}
-      <div className="w-72 bg-gradient-to-b from-teal-600 to-teal-800 text-white shadow-xl p-6 flex flex-col">
+      <aside
+        className={`relative ${
+          collapsed ? "w-20" : "w-72"
+        } bg-gradient-to-b from-[#016b65] to-[#029c8f] text-white shadow-xl p-4 flex flex-col transition-all duration-300`}
+      >
+        {/* Toggle Button */}
+        <button
+          className="absolute top-4 right-6 text-white text-xl bg-gray-400 hover:bg-gray-300 cursor-pointer p-2 rounded-full shadow-md transition-all duration-200"
+          onClick={() => setCollapsed(!collapsed)}
+        >
+          {collapsed ? "☰" : "←"}
+        </button>
+
         {/* Logo Section */}
-        <hr className="w-full border-gray-300 my-6" />
-        <div className="flex flex-row items-center mb-10 ">
-            <img
-              src={Logo}
-              alt="MediDocs Icon"
-              className="h-8 w-8 md:h-12 md:w-12 object-cover rounded-full "
-            />
-            
+        <div className="flex items-center justify-center mt-14 mb-10">
+          <img src={Logo} alt="Icon" className="h-10 w-10 rounded-full object-cover" />
+          {!collapsed && (
             <img
               src={Medidocs}
-              alt="MEDIDOCS Logo"
-              className="mx-auto h-10 md:h-16 object-contain -ml-5"
+              alt="MediDocs"
+              className="h-12 ml-3 object-contain"
             />
-          
-          <hr className="w-full border-gray-300 my-2" />
+          )}
         </div>
-       
 
-        {/* Navigation Links */}
-        <nav className="flex flex-col  flex-grow space-y-0.5">
+        {/* Menu Links */}
+        <nav className="flex flex-col gap-2 flex-grow">
           {SIDEBAR_MENU.map((menu) => (
             <Link
               key={menu.name}
               to={menu.path}
-              className={`flex items-center p-3 text-lg font-semibold rounded-lg transition-all duration-300 ${
-                location.pathname === menu.path
-                  ? "bg-teal-800 shadow-lg border-2 border-teal-600"
-                  : "hover:bg-teal-700 hover:pl-6"
+              className={`flex items-center ${
+                collapsed ? "justify-center" : "justify-start gap-4"
+              } p-3 rounded-lg text-xl font-medium hover:bg-[#027e72] transition-all ${
+                location.pathname === menu.path ? "bg-[#016f63]" : ""
               }`}
             >
-              <i className={`${menu.icon} mr-4 text-2xl`} />
-              <span className="text-white">{menu.name}</span>
+              <div className="text-2xl">{menu.icon}</div>
+              {!collapsed && menu.name}
             </Link>
           ))}
-
-          {/* Logout */}
         </nav>
-      </div>
+      </aside>
 
-      {/* Content Area */}
+      {/* Main Content */}
       <div className="flex-1 flex flex-col">
+        
         {/* Header */}
-        <header className="bg-white p-6 shadow-lg flex items-center border-b-2 border-gray-200">
-          {/* Left Section: User Profile & Name */}
-          <div className="flex items-center space-x-4">
-            <div
-              className="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center text-gray-600 shadow-lg cursor-pointer"
-              onClick={() => {
-                navigate("/notification");
-              }}
-            >
-              <Badge count={user?.notification.length}>
-                <i className="fas fa-user text-lg text-gray-700 cursor-pointer"></i>
-              </Badge>
-            </div>
-            <span className="text-lg text-gray-800 font-medium hover:text-teal-600 transition">
-              <Link>
-                Hello <b>{user?.name}</b>
-              </Link>
+        <header className="flex justify-between items-center bg-white p-6 shadow-sm border-b border-gray-200">
+          <div className="flex items-center gap-4">
+            <Badge count={user?.notification.length}>
+              <div
+                onClick={() => navigate("/notification")}
+                className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center cursor-pointer hover:bg-gray-200"
+              >
+                <FiBell className="text-[#029c8f] text-xl" />
+              </div>
+            </Badge>
+            <span className="text-lg text-gray-800 font-semibold">
+              Hello, <b>{user?.name}</b>
             </span>
           </div>
 
-          {/* Right Section: Logout & Signup - Pushed to Right */}
-          <div className="flex items-center space-x-6 ml-auto">
+          {/* Right buttons */}
+          <div className="flex items-center gap-6">
             <div
               onClick={handleSignup}
-              className="cursor-pointer text-lg text-teal-700 hover:text-teal-600 hover:underline transition-all rounded-lg flex items-center"
+              className="flex items-center cursor-pointer text-[#016b65] hover:text-[#014f56] font-medium"
             >
-              <i className="fas fa-user-plus mr-2 text-2xl" />
-              Signup
+              <FiUserPlus className="mr-2" /> Signup
             </div>
 
             <div
               onClick={handleLogout}
-              className="cursor-pointer text-lg text-teal-700 hover:text-teal-600 hover:underline transition-all rounded-lg flex items-center"
+              className="flex items-center cursor-pointer text-[#016b65] hover:text-[#014f56] font-medium"
             >
-              <i className="fas fa-sign-out-alt mr-2 text-2xl" />
-              Logout
+              <FiLogOut className="mr-2" /> Logout
             </div>
           </div>
         </header>
 
-        {/* Main Body */}
-        <main className="flex-1 p-8 bg-green-200 overflow-y-auto min-h-screen ">
-          <div className="bg-white p-8 rounded-xl shadow-lg space-y-6 border border-gray-200">
+        {/* Page Content */}
+        <main className="flex-1 p-6 overflow-y-auto bg-[#e6f2f8]">
+          <div className="bg-white rounded-xl p-8 shadow-md border border-gray-100">
             {children}
           </div>
         </main>
