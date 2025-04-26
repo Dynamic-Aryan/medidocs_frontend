@@ -46,6 +46,10 @@ const API_ENDPOINTS = {
   allAppointments:`${BASE_URL}/admin/adminappointments`,
   deleteAppointmentByAdmin:(appointmentId)=>`${BASE_URL}/admin/delete-appointment/${appointmentId}`,
   changeUserRole: `${BASE_URL}/admin/changeuserrole`,
+
+
+  // payment
+  getStripePayment:`${BASE_URL}/stripe/create-checkout-session`,
 };
 
 export default API_ENDPOINTS;

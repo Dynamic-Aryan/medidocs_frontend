@@ -120,7 +120,7 @@ const BookingPage = () => {
       dispatch(showLoading());
 
       const res = await axios.post(
-        "http://localhost:5000/api/stripe/create-checkout-session", // This part remains as is
+        API_ENDPOINTS.getStripePayment, // This part remains as is
         {
           doctorInfo: doctors,
           userInfo: user,
