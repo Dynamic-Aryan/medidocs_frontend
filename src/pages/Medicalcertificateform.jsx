@@ -21,6 +21,32 @@ const MedicalCertificateForm = () => {
   const [approvedDoctors, setApprovedDoctors] = useState([]);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [paymentModalVisible, setPaymentModalVisible] = useState(false);
+  const [cardInfo, setCardInfo] = useState({
+    cardNumber: "",
+    expiryDate: "",
+    cvc: "",
+    cardholderName: "",
+    isReadyToPay: false,
+  });
+  const handleCardNumberChange = (e) => {
+    let value = e.target.value.replace(/\D/g, "").slice(0, 16);
+    value = value.replace(/(.{4})/g, "$1 ").trim();
+    setCardInfo({ ...cardInfo, cardNumber: value });
+  };
+  const handleExpiryDateChange = (e) => {
+    let value = e.target.value.replace(/\D/g, ""); // Remove non-digit characters
+    if (value.length > 2) {
+      value = value.slice(0, 2) + "/" + value.slice(2, 4); // Format to MM/YY
+    }
+    setCardInfo({ ...cardInfo, expiryDate: value });
+  };
+  const handleCVCChange = (e) => {
+    let value = e.target.value.replace(/\D/g, "").slice(0, 3);
+    setCardInfo({ ...cardInfo, cvc: value });
+  };
+  const handleCardholderNameChange = (e) => {
+    setCardInfo({ ...cardInfo, cardholderName: e.target.value.toUpperCase() });
+  };
 
   const initialValues = {
     name: user?.name || "",
@@ -396,7 +422,13 @@ const MedicalCertificateForm = () => {
           <div className="my-6">
             <p className="text-gray-600 mb-4">
               For a faster process, you can also send us a short video
-              explaining your symptoms through WhatsApp.
+              explaining your symptoms through WhatsApp. Additionally, please
+              include:
+              <ul className="list-disc list-inside pl-4 mt-2 text-gray-600">
+                <li>Your full walking video.</li>
+                <li>Your body temperature (if measured).</li>
+                <li>Your full name and identity for verification.</li>
+              </ul>
             </p>
             <Button type="primary" onClick={handleWhatsAppLink}>
               Send Video on WhatsApp
@@ -412,6 +444,7 @@ const MedicalCertificateForm = () => {
               </Checkbox>
             </div>
           </div>
+
           <div className="flex justify-center mt-8">
             <Button
               type="primary"
@@ -453,6 +486,8 @@ const MedicalCertificateForm = () => {
                   <input
                     type="text"
                     placeholder="1234 5678 9012 3456"
+                    value={cardInfo.cardNumber}
+                    onChange={handleCardNumberChange}
                     className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
@@ -464,6 +499,8 @@ const MedicalCertificateForm = () => {
 
                   <input
                     type="text"
+                    value={cardInfo.cardholderName}
+                    onChange={handleCardholderNameChange}
                     placeholder="Cardholder Name"
                     className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
@@ -476,6 +513,8 @@ const MedicalCertificateForm = () => {
 
                   <input
                     type="text"
+                    value={cardInfo.expiryDate}
+                    onChange={handleExpiryDateChange}
                     placeholder="Expiry MM/YY"
                     className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
@@ -487,6 +526,8 @@ const MedicalCertificateForm = () => {
 
                   <input
                     type="text"
+                    value={cardInfo.cvc}
+                    onChange={handleCVCChange}
                     placeholder="CVV"
                     className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
@@ -496,7 +537,7 @@ const MedicalCertificateForm = () => {
               {/* Buttons */}
               <div className="flex flex-col gap-3 pt-4">
                 <button
-                  className="bg-cyan-600 hover:bg-cyan-700 text-white font-semibold py-3 rounded-lg transition-all duration-300"
+                  className="bg-cyan-200 hover:bg-cyan-400 cursor-pointer  font-semibold py-3 rounded-lg transition-all duration-300"
                   onClick={() => {
                     setPaymentModalVisible(false);
                     form.submit(); // Pay and Submit form

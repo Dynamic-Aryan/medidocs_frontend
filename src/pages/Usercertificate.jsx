@@ -246,13 +246,19 @@ const Usercertificate = () => {
       doc.setTextColor(255, 255, 255);
   
       const footerText =
-        "This certificate is digitally issued by Medidocs — your trusted health partner. " +
-        "This medical certificate is not valid without the document number, doctor's signature, identity proof URL, and report URL. " +
-        "The details mentioned in this medical document are as per the symptoms shared by the patient during the online consultation. " +
-        "Neither the doctor nor Medidocs Organization holds responsibility if false information was provided.";
-  
-      const footerLines = doc.splitTextToSize(footerText, pageWidth - 40);
-      doc.text(footerLines, 20, footerY + 7);
+  "This certificate is digitally issued by Medidocs — your trusted health partner. " +
+  "This medical certificate is not valid without the document number, doctor's signature, identity proof URL, and report URL. " +
+  "The details mentioned in this medical document are as per the symptoms shared by the patient during the online consultation. " +
+  "Neither the doctor nor Medidocs Organization holds responsibility if false information was provided. " +
+  "It is imperative to consult with your healthcare provider for any changes in your medical condition or treatment plan. " +
+  "For any queries regarding this certificate, please contact Medidocs support at support@medidocs.com. " +
+  "This certificate should not be used for any purpose other than what it was issued for and cannot be transferred or altered without prior approval from Medidocs. " +
+  "Medidocs takes all reasonable measures to ensure the accuracy and confidentiality of your medical records, but it is the responsibility of the patient to ensure the information provided is correct.";
+
+    
+
+      const footerLines = doc.splitTextToSize(footerText, pageWidth - 10);
+      doc.text(footerLines, 5, footerY + 5);
   
       // Save PDF
       doc.save(`Medical_Certificate_${certificate.name}.pdf`);

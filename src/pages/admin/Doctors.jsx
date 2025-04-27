@@ -131,17 +131,14 @@ const Doctors = () => {
       dataIndex: "signatureUrl",
       render: (url) =>
         url ? (
-          <a
-            href={url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-blue-600 underline hover:text-blue-800"
-          >
-            View Signature
-          </a>
+          <img
+            src={url}
+            alt="Signature"
+            className="w-24 h-16 object-contain"
+          />
         ) : (
           <span className="text-gray-400 italic">N/A</span>
-        ),
+        )
     },
     {
       title: "Authorized Degree",

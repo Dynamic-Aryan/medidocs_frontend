@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import Layout from '../../components/Layout';
-import axios from 'axios';
+import React, { useEffect, useState } from "react";
+import Layout from "../../components/Layout";
+import axios from "axios";
 import {
   Table,
   Modal,
@@ -8,10 +8,10 @@ import {
   Button,
   Descriptions,
   Input,
-  Typography
-} from 'antd';
-import { SearchOutlined } from '@ant-design/icons';
-import API_ENDPOINTS from '../../api/endpoints';
+  Typography,
+} from "antd";
+import { SearchOutlined } from "@ant-design/icons";
+import API_ENDPOINTS from "../../api/endpoints";
 
 const { Title } = Typography;
 
@@ -20,7 +20,7 @@ const Medicalcertusers = () => {
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [searchText, setSearchText] = useState('');
+  const [searchText, setSearchText] = useState("");
 
   // Fetch all users
   const getCertUsers = async () => {
@@ -56,15 +56,22 @@ const Medicalcertusers = () => {
   const handleSearch = (value) => {
     setSearchText(value);
     const lowerSearch = value.toLowerCase();
-    const filtered = users.filter(user =>
-      user.name?.toLowerCase().includes(lowerSearch) ||
-      user.email?.toLowerCase().includes(lowerSearch) ||
-      user.reason?.toLowerCase().includes(lowerSearch)
+    const filtered = users.filter(
+      (user) =>
+        user.name?.toLowerCase().includes(lowerSearch) ||
+        user.email?.toLowerCase().includes(lowerSearch) ||
+        user.reason?.toLowerCase().includes(lowerSearch) ||
+        user.userId?.toLowerCase().includes(lowerSearch)
     );
     setFilteredUsers(filtered);
   };
 
   const columns = [
+    {
+      title: "Doc.ID",
+      dataIndex: "userId",
+      className: "text-xs font-semibold text-gray-700",
+    },
     {
       title: "Name",
       dataIndex: "name",
@@ -80,25 +87,11 @@ const Medicalcertusers = () => {
       dataIndex: "gender",
       className: "text-gray-600",
     },
+
+    
     {
-      title: "Duration",
-      dataIndex: "duration",
-      className: "text-gray-600",
-    },
-    {
-      title: "Reason",
-      dataIndex: "reason",
-      className: "text-gray-600",
-    },
-    {
-      title: "Symptoms",
-      dataIndex: "symptoms",
-      className: "text-gray-600",
-      render: symptoms => symptoms?.join(', '),
-    },
-    {
-      title:"Identity",
-      dataIndex:"identityProofUrl",
+      title: "Identity",
+      dataIndex: "identityProofUrl",
       render: (url) =>
         url ? (
           <a
@@ -114,8 +107,8 @@ const Medicalcertusers = () => {
         ),
     },
     {
-        title:"Report File",
-      dataIndex:"reportFileUrl",
+      title: "Report File",
+      dataIndex: "reportFileUrl",
       render: (url) =>
         url ? (
           <a
@@ -146,44 +139,42 @@ const Medicalcertusers = () => {
       key: "action",
       render: (_, record) => (
         <Tooltip title="View Profile">
-          <Button onClick={() => showProfileModal(record)} className="border-gray-500">
+          <Button
+            onClick={() => showProfileModal(record)}
+            className="border-gray-500"
+          >
             View Profile
           </Button>
         </Tooltip>
       ),
-    }
+    },
   ];
 
   return (
     <Layout>
-    <div className='p-4'>
-    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
-    <Title level={3} className="mb-0">
+      <div className="p-4">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+          <Title level={3} className="mb-0">
             User certificate Details
           </Title>
-        <div className="flex gap-2 flex-wrap">
-  
-          <Input
-            placeholder="Search by name, email or reason"
-             prefix={<SearchOutlined />}
-            value={searchText}
-            onChange={(e) => handleSearch(e.target.value)}
-            style={{ width: 220 }}
-            
-          />
+          <div className="flex gap-2 flex-wrap">
+            <Input
+              placeholder="Search by name, email or reason"
+              prefix={<SearchOutlined />}
+              value={searchText}
+              onChange={(e) => handleSearch(e.target.value)}
+              style={{ width: 220 }}
+            />
+          </div>
         </div>
-      
+
+        <Table
+          columns={columns}
+          dataSource={filteredUsers}
+          pagination={{ pageSize: 5 }}
+          rowKey="_id"
+        />
       </div>
-     
-          <Table
-            columns={columns}
-            dataSource={filteredUsers}
-            
-            pagination={{ pageSize: 5 }}
-            rowKey="_id"
-          />
-       
-    </div>
 
       {/* Profile Modal */}
       <Modal
@@ -198,56 +189,98 @@ const Medicalcertusers = () => {
             bordered
             column={1}
             size="small"
-            labelStyle={{ fontWeight: 'bold', width: '30%' }}
+            labelStyle={{ fontWeight: "bold", width: "30%" }}
           >
-            <Descriptions.Item label="Name">{selectedUser.name}</Descriptions.Item>
-            <Descriptions.Item label="Age">{selectedUser.age}</Descriptions.Item>
-            <Descriptions.Item label="Gender">{selectedUser.gender}</Descriptions.Item>
-            <Descriptions.Item label="Address">{selectedUser.address}</Descriptions.Item>
-            <Descriptions.Item label="Employer">{selectedUser.employer}</Descriptions.Item>
-            <Descriptions.Item label="Email">{selectedUser.email}</Descriptions.Item>
-            <Descriptions.Item label="Reason">{selectedUser.reason}</Descriptions.Item>
-            <Descriptions.Item label="Symptoms">{selectedUser.symptoms?.join(', ')}</Descriptions.Item>
-            <Descriptions.Item label="Duration of Symptoms">{selectedUser.duration}</Descriptions.Item>
-            <Descriptions.Item label="Duration of Illness">{selectedUser.durationOfIllness}</Descriptions.Item>
-            <Descriptions.Item label="Medical History">{selectedUser.medicalHistory}</Descriptions.Item>
-            <Descriptions.Item label="Medications">{selectedUser.medications}</Descriptions.Item>
-            <Descriptions.Item label="Emergency Treatment">{selectedUser.emergencyTreatment}</Descriptions.Item>
-            <Descriptions.Item label="Previous Surgeries">{selectedUser.previousSurgeries}</Descriptions.Item>
-            <Descriptions.Item label="Family History">{selectedUser.familyHistory}</Descriptions.Item>
-            <Descriptions.Item label="Environmental Cause">{selectedUser.environmentalCause}</Descriptions.Item>
-            <Descriptions.Item label="Severity">{selectedUser.severity}</Descriptions.Item>
-            <Descriptions.Item label="Consultation Status">{selectedUser.consultationStatus}</Descriptions.Item>
-            <Descriptions.Item label="Certificate Purpose">{selectedUser.certificatePurpose}</Descriptions.Item>
-            <Descriptions.Item label="Status">{selectedUser.status}</Descriptions.Item>
-            <Descriptions.Item label="Digital Signature">{selectedUser.digitalSignature || 'N/A'}</Descriptions.Item>
-            
-              <Descriptions.Item label="Identity Proof">
-                          {selectedUser.identityProofUrl ? (
-                            <a
-                              href={selectedUser.identityProofUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                            >
-                              View Identity
-                            </a>
-                          ) : (
-                            "N/A"
-                          )}
-                        </Descriptions.Item>
-                        <Descriptions.Item label="Report File">
-                          {selectedUser.reportFileUrl ? (
-                            <a
-                              href={selectedUser.reportFileUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                            >
-                              View Report
-                            </a>
-                          ) : (
-                            "N/A"
-                          )}
-                        </Descriptions.Item>
+            <Descriptions.Item label="Name">
+              {selectedUser.name}
+            </Descriptions.Item>
+            <Descriptions.Item label="Age">
+              {selectedUser.age}
+            </Descriptions.Item>
+            <Descriptions.Item label="Gender">
+              {selectedUser.gender}
+            </Descriptions.Item>
+            <Descriptions.Item label="Address">
+              {selectedUser.address}
+            </Descriptions.Item>
+            <Descriptions.Item label="Employer">
+              {selectedUser.employer}
+            </Descriptions.Item>
+            <Descriptions.Item label="Email">
+              {selectedUser.email}
+            </Descriptions.Item>
+            <Descriptions.Item label="Reason">
+              {selectedUser.reason}
+            </Descriptions.Item>
+            <Descriptions.Item label="Symptoms">
+              {selectedUser.symptoms?.join(", ")}
+            </Descriptions.Item>
+            <Descriptions.Item label="Duration of Symptoms">
+              {selectedUser.duration}
+            </Descriptions.Item>
+            <Descriptions.Item label="Duration of Illness">
+              {selectedUser.durationOfIllness}
+            </Descriptions.Item>
+            <Descriptions.Item label="Medical History">
+              {selectedUser.medicalHistory}
+            </Descriptions.Item>
+            <Descriptions.Item label="Medications">
+              {selectedUser.medications}
+            </Descriptions.Item>
+            <Descriptions.Item label="Emergency Treatment">
+              {selectedUser.emergencyTreatment}
+            </Descriptions.Item>
+            <Descriptions.Item label="Previous Surgeries">
+              {selectedUser.previousSurgeries}
+            </Descriptions.Item>
+            <Descriptions.Item label="Family History">
+              {selectedUser.familyHistory}
+            </Descriptions.Item>
+            <Descriptions.Item label="Environmental Cause">
+              {selectedUser.environmentalCause}
+            </Descriptions.Item>
+            <Descriptions.Item label="Severity">
+              {selectedUser.severity}
+            </Descriptions.Item>
+            <Descriptions.Item label="Consultation Status">
+              {selectedUser.consultationStatus}
+            </Descriptions.Item>
+            <Descriptions.Item label="Certificate Purpose">
+              {selectedUser.certificatePurpose}
+            </Descriptions.Item>
+            <Descriptions.Item label="Status">
+              {selectedUser.status}
+            </Descriptions.Item>
+            <Descriptions.Item label="Digital Signature">
+              {selectedUser.digitalSignature || "N/A"}
+            </Descriptions.Item>
+
+            <Descriptions.Item label="Identity Proof">
+              {selectedUser.identityProofUrl ? (
+                <a
+                  href={selectedUser.identityProofUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  View Identity
+                </a>
+              ) : (
+                "N/A"
+              )}
+            </Descriptions.Item>
+            <Descriptions.Item label="Report File">
+              {selectedUser.reportFileUrl ? (
+                <a
+                  href={selectedUser.reportFileUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  View Report
+                </a>
+              ) : (
+                "N/A"
+              )}
+            </Descriptions.Item>
             <Descriptions.Item label="Requested At">
               {new Date(selectedUser.requestedAt).toLocaleString()}
             </Descriptions.Item>

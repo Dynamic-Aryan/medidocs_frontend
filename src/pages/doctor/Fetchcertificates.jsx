@@ -128,8 +128,7 @@ const Fetchcertificates = () => {
 
   const columns = [
     { title: "User", dataIndex: "name", key: "name" },
-    { title: "Reason", dataIndex: "reason", key: "reason" },
-    { title: "Duration", dataIndex: "duration", key: "duration" },
+    { title: "DOC_ID", dataIndex: "doctorId", key: "ID" },
     { title: "Status", dataIndex: "status", key: "status" },
     {
       title: "Signature",
@@ -187,33 +186,30 @@ const Fetchcertificates = () => {
 
   return (
     <Layout>
-    <div className="p-4">
-    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
-    <Title level={3} className="mb-0">
+      <div className="p-4">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+          <Title level={3} className="mb-0">
             Manage Certificates
           </Title>
 
-        {/* 🔍 Search Input */}
-        <div className="flex gap-2 flex-wrap">
-          <Input
-            placeholder="Search by name..."
-             prefix={<SearchOutlined />}
-             style={{ width: 220 }}
-            value={searchTerm}
-            onChange={(e) => handleSearch(e.target.value)}
-          />
+          {/* 🔍 Search Input */}
+          <div className="flex gap-2 flex-wrap">
+            <Input
+              placeholder="Search by name..."
+              prefix={<SearchOutlined />}
+              style={{ width: 220 }}
+              value={searchTerm}
+              onChange={(e) => handleSearch(e.target.value)}
+            />
+          </div>
         </div>
 
-       
-      </div>
-      
-          <Table
-            columns={columns}
-            dataSource={filteredCertificates}
-            rowKey="_id"
-            pagination={{ pageSize: 6 }}
-          />
-       
+        <Table
+          columns={columns}
+          dataSource={filteredCertificates}
+          rowKey="_id"
+          pagination={{ pageSize: 6 }}
+        />
 
         <Modal
           title="Add Your Signature"
@@ -237,7 +233,7 @@ const Fetchcertificates = () => {
             className="mt-1"
           />
         </Modal>
-    </div>
+      </div>
     </Layout>
   );
 };

@@ -70,6 +70,7 @@ const DoctorData = ({ doctor }) => {
           size="small"
           labelStyle={{ fontWeight: "bold", color: "#08979c" }}
         >
+          <Descriptions.Item label="ID">{doctor._id}</Descriptions.Item>
           <Descriptions.Item label="First Name">{doctor.firstName}</Descriptions.Item>
           <Descriptions.Item label="Last Name">{doctor.lastName}</Descriptions.Item>
           <Descriptions.Item label="Email">{doctor.email}</Descriptions.Item>

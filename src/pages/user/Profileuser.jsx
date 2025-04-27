@@ -93,7 +93,7 @@ const Profileuser = () => {
                             </Form.Item>
                         </div>
                         <div className="flex justify-center mt-4">
-                            <button className="bg-blue-500 text-white py-2 px-6 rounded-lg hover:bg-blue-600 transition duration-300">Update</button>
+                            <button className="bg-cyan-200 cursor-pointer text-white py-2 px-6 rounded-lg hover:bg-cyan-400 transition duration-300">Update</button>
                         </div>
                     </Form>
                 )}

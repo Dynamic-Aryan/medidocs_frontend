@@ -25,6 +25,7 @@ const UsersCertData = ({ user }) => {
         bordered={false}
         className="shadow-md hover:shadow-lg rounded-xl border border-teal-100 transition-all duration-300"
       >
+         <p><b>ID:</b> {user._id}</p>
         <p><b>Email:</b> {user.email}</p>
         <p><b>Employer:</b> {user.employer}</p>
         <p><b>Status:</b> {user.status}</p>
@@ -44,6 +45,7 @@ const UsersCertData = ({ user }) => {
           size="small"
           labelStyle={{ fontWeight: 'bold', color: '#08979c' }}
         >
+          <Descriptions.Item label="ID">{user._id}</Descriptions.Item>
           <Descriptions.Item label="Age">{user.age}</Descriptions.Item>
           <Descriptions.Item label="Gender">{user.gender}</Descriptions.Item>
           <Descriptions.Item label="Address" span={2}>{user.address}</Descriptions.Item>
