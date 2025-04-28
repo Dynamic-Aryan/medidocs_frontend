@@ -247,20 +247,20 @@ const BookingPage = () => {
                   Check Availability
                 </Button>
 
-                <Button
+                {/* <Button
                   type="link"
                   onClick={confirmStripePayment}
                   className="w-full bg-cyan-600 hover:bg-cyan-700 transition-all text-white font-semibold py-2 px-4 rounded-md shadow"
                 >
                   Confirm Booking with Stripe
-                </Button>
+                </Button> */}
 
                 <Button
                   type="dashed"
                   onClick={() => setShowPaymentModal(true)}
                   className="w-full bg-indigo-600 hover:bg-indigo-700 transition-all text-white font-semibold py-2 px-4 rounded-md shadow"
                 >
-                  Other Payment Options
+                   Payment Here
                 </Button>
               </div>
             </div>
