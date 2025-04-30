@@ -1,6 +1,4 @@
-# Save the generated README content as a .md file
 
-readme_content = """
 # 💊 Medidocs – Appointment & Medical Certificate System (Frontend)
 
 Welcome to the **frontend** of **Medidocs**, a modern and responsive medical appointment system built with **React** and **Vite**.
