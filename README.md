@@ -53,22 +53,30 @@ MEDIDOCS (Frontend)
 │── package.json             # Project dependencies
 │── vite.config.js           # Vite configuration
 ```
+![Screenshot 2025-04-26 125351](https://github.com/user-attachments/assets/74586df2-429d-4553-866e-09013d4f8dbc)
+![Screenshot 2025-04-26 125359](https://github.com/user-attachments/assets/baafb329-f17e-4c8c-9d16-4373c8ed6743)
+![Screenshot 2025-04-26 125415](https://github.com/user-attachments/assets/25e381df-ce0c-4afa-867d-9e7562b4dcc2)
+![Screenshot 2025-04-26 125429](https://github.com/user-attachments/assets/9b2edc64-acbc-44e3-893c-993697645df1)
+![Screenshot 2025-04-26 125438](https://github.com/user-attachments/assets/7f140465-1c54-4d00-8d1b-4375a99cfb2c)
+![Screenshot 2025-04-26 130555](https://github.com/user-attachments/assets/84c558e6-f7d9-44b4-b600-d106ee69fe47)
+![Screenshot 2025-04-26 130614](https://github.com/user-attachments/assets/83802bbd-4adc-4a33-82e2-b9c564e0abec)
+![Screenshot 2025-04-26 233157](https://github.com/user-attachments/assets/c7a1513a-4ac6-48c9-8cec-be4f5a3a90b2)
 
-![Screenshot 2025-04-26 125351](https://github.com/user-attachments/assets/089cebcb-26c7-4e9b-90ae-0e7cab04bad7)
-![Screenshot 2025-04-26 125359](https://github.com/user-attachments/assets/3259ff5a-92f1-4c5f-bb06-d7e7dd037add)
-
-![Screenshot 2025-04-26 125415](https://github.com/user-attachments/assets/a377d2b7-d38a-4ee2-984d-fcfec3b79739)
-
-![Screenshot 2025-04-26 125429](https://github.com/user-attachments/assets/5496407e-a98d-4214-a9c0-a915dfaa0198)
-
-![Screenshot 2025-04-26 125438](https://github.com/user-attachments/assets/fe2a308f-8fe4-4379-a7f6-9c14f9b3912d)
-
-![Screenshot 2025-04-26 130555](https://github.com/user-attachments/assets/bbc8cc7f-2cdd-47a8-8008-9cb5988b9fcc)
-
-![Screenshot 2025-04-26 130614](https://github.com/user-attachments/assets/d6fde306-776b-49d1-a7f1-a48061dd9d15)
+![Screenshot 2025-04-26 130653](https://github.com/user-attachments/assets/f715d926-b05a-49d7-b6e6-d9b30be70233)
 
 
-![Screenshot 2025-04-26 130653](https://github.com/user-attachments/assets/c3f61fc2-25b4-4e34-a271-3d2a0ac32bad)
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
